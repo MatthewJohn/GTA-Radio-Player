@@ -43,7 +43,11 @@ private:
     int currentStation;
 
     // player object
-    QMediaPlayer *player;
+    QMediaPlayer *players[2];
+    int currentPlayerItx;
+    QMediaPlayer* GetCurrentPlayer();
+    QMediaPlayer* GetNextPlayer();
+    void FlipPlayer();
 
     // List of stations
     QString stationFiles[MAX_STATIONS];

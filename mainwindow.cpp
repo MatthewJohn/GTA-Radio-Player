@@ -10,7 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->stationFileCount = 0;
     this->PopulateFileList();
-    this->player = new QMediaPlayer;
+    this->players[0] = new QMediaPlayer;
+    this->players[1] = new QMediaPlayer;
+    this->currentPlayerItx = 0;
 
     this->GetVolumeDial()->setValue(INITIAL_VOLUME);
     this->VolumeDialChangeSlot();
@@ -30,11 +32,24 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged()), this, SLOT(VolumeDialChangeSlot()));
 }
 
+QMediaPlayer* MainWindow::GetCurrentPlayer()
+{
+    return this->players[this->currentPlayerItx];
+}
+QMediaPlayer* MainWindow::GetNextPlayer()
+{
+    return this->players[this->currentPlayerItx ? 0 : 1];
+}
+void MainWindow::FlipPlayer()
+{
+    this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
+}
+
 void MainWindow::PlayPauseButtonSlot()
 {
     if (this->IsPlaying())
     {
-        this->player->pause();
+        this->GetCurrentPlayer()->pause();
         this->GetPlayPauseButton()->setText(PLAY_PAUSE_BUTTON_TEXT_PLAY);
     } else {
         this->Play();
@@ -52,7 +67,7 @@ bool MainWindow::IsPlaying()
     if (! this->IsPlayAvailable())
         return false;
 
-    return (this->player->state() == QMediaPlayer::PlayingState);
+    return (this->GetCurrentPlayer()->state() == QMediaPlayer::PlayingState);
 }
 
 void MainWindow::Play()
@@ -65,10 +80,10 @@ void MainWindow::Play()
     if (this->stationFileCount == 0)
         return;
 
-    this->player->play();
-    if (this->player->error())
-        this->DisplayError(this->player->errorString());
-    else if (this->player->state() != QMediaPlayer::PlayingState)
+    this->GetCurrentPlayer()->play();
+    if (this->GetCurrentPlayer()->error())
+        this->DisplayError(this->GetCurrentPlayer()->errorString());
+    else if (this->GetCurrentPlayer()->state() != QMediaPlayer::PlayingState)
         this->DisplayError("Not playing");
 }
 
@@ -77,7 +92,7 @@ void MainWindow::Pause()
     if (! this->IsPlaying())
         return;
 
-    this->player->pause();
+    this->GetCurrentPlayer()->pause();
 }
 
 void MainWindow::NextStation()
@@ -125,18 +140,27 @@ void MainWindow::SelectStation(int station_index)
 
     this->currentStation = station_index;
 
-    player->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
+    this->GetNextPlayer()->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
+
+    // Wait for player to load media
+    while (this->GetNextPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 
     // Set position based on time since application startup, using modulus of track length.
     // Ignore tts less than 0, maybe due to time change or race condition
     qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
     if (tts > 0)
     {
-        qint64 dur = this->player->duration();
-        if (dur)
-            player->setPosition(tts % this->player->duration());
-        this->DisplayError("Duration: " + QString::number(this->player->duration()));
+        qint64 dur = this->GetNextPlayer()->duration();
+        if (dur > 0)
+            this->GetNextPlayer()->setPosition(tts % this->GetNextPlayer()->duration());
+        //this->DisplayError("Duration: " + QString::number(this->GetNextPlayer()->duration()));
     }
+
+    // Pause old player, start new one and flip
+    this->GetCurrentPlayer()->pause();
+    this->GetNextPlayer()->play();
+    this->FlipPlayer();
 }
 
 QDial* MainWindow::GetVolumeDial()
@@ -147,7 +171,8 @@ QDial* MainWindow::GetVolumeDial()
 void MainWindow::VolumeDialChangeSlot()
 {
     this->DisplayError("Setting to: " + QString::number(this->GetVolumeDial()->value()));
-    this->player->setVolume(this->GetVolumeDial()->value());
+    this->GetCurrentPlayer()->setVolume(this->GetVolumeDial()->value());
+    this->GetNextPlayer()->setVolume(this->GetVolumeDial()->value());
 }
 
 QPushButton* MainWindow::GetPlayPauseButton()
