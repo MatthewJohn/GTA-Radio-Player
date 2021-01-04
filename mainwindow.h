@@ -11,7 +11,7 @@
 #include <QPushButton>
 
 #define MAX_STATIONS 20
-#define INITIAL_VOLUME 5
+#define INITIAL_VOLUME 40
 #define PLAY_PAUSE_BUTTON_TEXT_PLAY "Play"
 #define PLAY_PAUSE_BUTTON_TEXT_PAUSE "Pause"
 

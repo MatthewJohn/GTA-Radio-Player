@@ -140,6 +140,7 @@ void MainWindow::SelectStation(int station_index)
 
     this->currentStation = station_index;
 
+    // Update file path of next player
     this->GetNextPlayer()->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
 
     // Wait for player to load media
@@ -154,12 +155,15 @@ void MainWindow::SelectStation(int station_index)
         qint64 dur = this->GetNextPlayer()->duration();
         if (dur > 0)
             this->GetNextPlayer()->setPosition(tts % this->GetNextPlayer()->duration());
-        //this->DisplayError("Duration: " + QString::number(this->GetNextPlayer()->duration()));
     }
 
     // Pause old player, start new one and flip
-    this->GetCurrentPlayer()->pause();
-    this->GetNextPlayer()->play();
+    bool was_playing = this->IsPlaying();
+    if (was_playing)
+    {
+        this->GetCurrentPlayer()->pause();
+        this->GetNextPlayer()->play();
+    }
     this->FlipPlayer();
 }
 
@@ -170,7 +174,6 @@ QDial* MainWindow::GetVolumeDial()
 
 void MainWindow::VolumeDialChangeSlot()
 {
-    this->DisplayError("Setting to: " + QString::number(this->GetVolumeDial()->value()));
     this->GetCurrentPlayer()->setVolume(this->GetVolumeDial()->value());
     this->GetNextPlayer()->setVolume(this->GetVolumeDial()->value());
 }
