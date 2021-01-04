@@ -145,7 +145,7 @@ void MainWindow::SelectStation(int station_index)
 
     // Wait for player to load media
     while (this->GetNextPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, MEDIA_LOAD_WAIT_PERIOD);
 
     // Set position based on time since application startup, using modulus of track length.
     // Ignore tts less than 0, maybe due to time change or race condition
@@ -162,6 +162,10 @@ void MainWindow::SelectStation(int station_index)
     if (was_playing)
     {
         this->GetCurrentPlayer()->pause();
+        // Pause for dramatic effect!
+        qint64 start_pause = QDateTime::currentMSecsSinceEpoch();
+        while (QDateTime::currentMSecsSinceEpoch() < (start_pause + STATION_CHANGE_DRAMATIC_PAUSE_DURATION))
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
         this->GetNextPlayer()->play();
     }
     this->FlipPlayer();
