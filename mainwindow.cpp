@@ -21,12 +21,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Select initial station
     if (this->IsPlayAvailable())
         this->SelectStation(0);
-    this->Play();
+    this->PlayPauseButtonSlot();
 
     // Bind knobs
-    QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(this->PlayPauseButtonSlot()));
-    //QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(this->PreviousButtonSlot()));
-    //QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(this->NextButtonSlot()));
+    QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(PlayPauseButtonSlot()));
+    QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(NextStation()));
+    QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this,   SLOT(PreviousStation()));
 }
 
 void MainWindow::PlayPauseButtonSlot()

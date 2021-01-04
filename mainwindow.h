@@ -29,6 +29,8 @@ public:
 
 public slots:
     void PlayPauseButtonSlot();
+    void NextStation();
+    void PreviousStation();
 
 private:
     Ui::MainWindow *ui;
@@ -58,8 +60,6 @@ private:
     bool IsPlayAvailable();
     bool IsPlaying();
     void SelectStation(int station_index);
-    void NextStation();
-    void PreviousStation();
 
     QDial* GetVolumeDial();
     QPushButton* GetPlayPauseButton();
