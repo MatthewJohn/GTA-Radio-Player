@@ -11,7 +11,7 @@
 #include <QPushButton>
 
 #define MAX_STATIONS 20
-#define INITIAL_VOLUME 50
+#define INITIAL_VOLUME 5
 #define PLAY_PAUSE_BUTTON_TEXT_PLAY "Play"
 #define PLAY_PAUSE_BUTTON_TEXT_PAUSE "Pause"
 
@@ -31,6 +31,7 @@ public slots:
     void PlayPauseButtonSlot();
     void NextStation();
     void PreviousStation();
+    void VolumeDialChangeSlot();
 
 private:
     Ui::MainWindow *ui;

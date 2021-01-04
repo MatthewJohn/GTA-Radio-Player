@@ -12,8 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->PopulateFileList();
     this->player = new QMediaPlayer;
 
-    this->SetVolume(INITIAL_VOLUME);
     this->GetVolumeDial()->setValue(INITIAL_VOLUME);
+    this->VolumeDialChangeSlot();
 
     // Set startup time
     this->startupTime = QDateTime::currentMSecsSinceEpoch();
@@ -26,7 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Bind knobs
     QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(PlayPauseButtonSlot()));
     QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(NextStation()));
-    QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this,   SLOT(PreviousStation()));
+    QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(PreviousStation()));
+    QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged()), this, SLOT(VolumeDialChangeSlot()));
 }
 
 void MainWindow::PlayPauseButtonSlot()
@@ -79,14 +80,8 @@ void MainWindow::Pause()
     this->player->pause();
 }
 
-void MainWindow::SetVolume(qint64 new_volume)
-{
-    this->player->setVolume(new_volume);
-}
-
 void MainWindow::NextStation()
 {
-
 }
 
 void MainWindow::PreviousStation()
@@ -126,6 +121,12 @@ void MainWindow::SelectStation(int station_index)
 QDial* MainWindow::GetVolumeDial()
 {
     return this->findChild<QDial *>("volumeDial");
+}
+
+void MainWindow::VolumeDialChangeSlot()
+{
+    this->DisplayError("Setting to: " + QString::number(this->GetVolumeDial()->value()));
+    this->player->setVolume(this->GetVolumeDial()->value());
 }
 
 QPushButton* MainWindow::GetPlayPauseButton()
