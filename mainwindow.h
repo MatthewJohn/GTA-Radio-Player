@@ -7,6 +7,7 @@
 #include <QMediaPlayer>
 #include <QMessageBox>
 #include <QDial>
+#include <QDateTime>
 
 #define MAX_STATIONS 20
 #define INITIAL_VOLUME 50
@@ -41,6 +42,8 @@ private:
 
     // Populate list of station files
     void PopulateFileList();
+
+    qint64 startupTime;
 
     // Play
     void Play();

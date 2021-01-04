@@ -15,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->SetVolume(INITIAL_VOLUME);
     this->GetVolumeDial()->setValue(INITIAL_VOLUME);
 
+    // Set startup time
+    this->startupTime = QDateTime::currentMSecsSinceEpoch();
+
     // Select initial station
     if (this->IsPlayAvailable())
         this->SelectStation(0);
@@ -82,6 +85,17 @@ void MainWindow::SelectStation(int station_index)
     }
 
     player->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
+
+    // Set position based on time since application startup, using modulus of track length.
+    // Ignore tts less than 0, maybe due to time change or race condition
+    qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
+    if (tts > 0)
+    {
+        qint64 dur = this->player->duration();
+        if (dur)
+            player->setPosition(tts % this->player->duration());
+        this->DisplayError("Duration: " + QString::number(this->player->duration()));
+    }
 }
 
 QDial* MainWindow::GetVolumeDial()
