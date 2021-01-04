@@ -1,5 +1,11 @@
 
+# Immediate
 Fix double clicking next/previous (i.e. before next station completes)
 Fix VolumeDial bind
+Allow change of path
+Save current volume/path on exit for loading via settings
 
+# Later
 Add support for directory-based stations
+Add translations
+Display image from mp3 metadata
