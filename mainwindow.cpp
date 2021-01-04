@@ -82,10 +82,29 @@ void MainWindow::Pause()
 
 void MainWindow::NextStation()
 {
+    if (! this->IsPlayAvailable())
+        return;
+
+    int new_station_id;
+    // If end of station index, start from 0
+    if (currentStation == (this->stationFileCount - 1))
+        new_station_id = 0;
+    else
+        new_station_id = currentStation + 1;
+    this->SelectStation(new_station_id);
 }
 
 void MainWindow::PreviousStation()
 {
+    if (! this->IsPlayAvailable())
+        return;
+
+    int new_station_id;
+    if (currentStation == 0)
+        new_station_id = (this->stationFileCount - 1);
+    else
+        new_station_id = currentStation - 1;
+    this->SelectStation(new_station_id);
 
 }
 
@@ -103,6 +122,8 @@ void MainWindow::SelectStation(int station_index)
         this->DisplayError("Station ID out of range");
         return;
     }
+
+    this->currentStation = station_index;
 
     player->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
 
