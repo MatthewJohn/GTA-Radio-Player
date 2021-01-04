@@ -162,6 +162,7 @@ void MainWindow::SelectStation(int station_index)
     if (was_playing)
     {
         this->GetCurrentPlayer()->pause();
+        this->SetDisplay("Re-tuning...");
         // Pause for dramatic effect!
         qint64 start_pause = QDateTime::currentMSecsSinceEpoch();
         while (QDateTime::currentMSecsSinceEpoch() < (start_pause + STATION_CHANGE_DRAMATIC_PAUSE_DURATION))
@@ -169,6 +170,20 @@ void MainWindow::SelectStation(int station_index)
         this->GetNextPlayer()->play();
     }
     this->FlipPlayer();
+    this->SetDisplay(this->GetMediaName());
+}
+
+QString MainWindow::GetMediaName()
+{
+    QString name = this->GetCurrentPlayer()->metaData(QMediaMetaData::Title).toString();
+    if (name.isEmpty())
+        name = this->GetCurrentPlayer()->currentMedia().canonicalUrl().fileName();
+    return name;
+}
+
+void MainWindow::SetDisplay(QString text)
+{
+    this->findChild<QTextBrowser *>("display")->setText(text);
 }
 
 QDial* MainWindow::GetVolumeDial()

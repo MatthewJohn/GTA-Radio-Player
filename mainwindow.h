@@ -5,10 +5,12 @@
 #include <QDirIterator>
 #include <QDebug>
 #include <QMediaPlayer>
+#include <QMediaMetaData>
 #include <QMessageBox>
 #include <QDial>
 #include <QDateTime>
 #include <QPushButton>
+#include <QTextBrowser>
 
 #define MAX_STATIONS 20
 #define INITIAL_VOLUME 40
@@ -67,6 +69,9 @@ private:
     bool IsPlayAvailable();
     bool IsPlaying();
     void SelectStation(int station_index);
+    QString GetMediaName();
+
+    void SetDisplay(QString text);
 
     QDial* GetVolumeDial();
     QPushButton* GetPlayPauseButton();
