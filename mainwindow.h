@@ -8,9 +8,12 @@
 #include <QMessageBox>
 #include <QDial>
 #include <QDateTime>
+#include <QPushButton>
 
 #define MAX_STATIONS 20
 #define INITIAL_VOLUME 50
+#define PLAY_PAUSE_BUTTON_TEXT_PLAY "Play"
+#define PLAY_PAUSE_BUTTON_TEXT_PAUSE "Pause"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,6 +26,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+public slots:
+    void PlayPauseButtonSlot();
 
 private:
     Ui::MainWindow *ui;
@@ -50,11 +56,15 @@ private:
     void Pause();
     void SetVolume(qint64 new_volume);
     bool IsPlayAvailable();
+    bool IsPlaying();
     void SelectStation(int station_index);
     void NextStation();
     void PreviousStation();
 
     QDial* GetVolumeDial();
+    QPushButton* GetPlayPauseButton();
+    QPushButton* GetNextButton();
+    QPushButton* GetPreviousButton();
 
     void DisplayError(QString err);
 

@@ -22,6 +22,23 @@ MainWindow::MainWindow(QWidget *parent)
     if (this->IsPlayAvailable())
         this->SelectStation(0);
     this->Play();
+
+    // Bind knobs
+    QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(this->PlayPauseButtonSlot()));
+    //QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(this->PreviousButtonSlot()));
+    //QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(this->NextButtonSlot()));
+}
+
+void MainWindow::PlayPauseButtonSlot()
+{
+    if (this->IsPlaying())
+    {
+        this->player->pause();
+        this->GetPlayPauseButton()->setText(PLAY_PAUSE_BUTTON_TEXT_PLAY);
+    } else {
+        this->Play();
+        this->GetPlayPauseButton()->setText(PLAY_PAUSE_BUTTON_TEXT_PAUSE);
+    }
 }
 
 bool MainWindow::IsPlayAvailable()
@@ -29,10 +46,18 @@ bool MainWindow::IsPlayAvailable()
     return (this->stationFileCount > 0);
 }
 
+bool MainWindow::IsPlaying()
+{
+    if (! this->IsPlayAvailable())
+        return false;
+
+    return (this->player->state() == QMediaPlayer::PlayingState);
+}
+
 void MainWindow::Play()
 {
     // Cannot play if already playing
-    if (this->player->state() == QMediaPlayer::PlayingState)
+    if (this->IsPlaying())
         return;
 
     // No stations available
@@ -48,7 +73,7 @@ void MainWindow::Play()
 
 void MainWindow::Pause()
 {
-    if (this->player->state() != QMediaPlayer::PlayingState)
+    if (! this->IsPlaying())
         return;
 
     this->player->pause();
@@ -101,6 +126,22 @@ void MainWindow::SelectStation(int station_index)
 QDial* MainWindow::GetVolumeDial()
 {
     return this->findChild<QDial *>("volumeDial");
+}
+
+QPushButton* MainWindow::GetPlayPauseButton()
+{
+    return this->findChild<QPushButton *>("playPauseButton");
+}
+
+QPushButton* MainWindow::GetNextButton()
+{
+    return this->findChild<QPushButton *>("nextButton");
+}
+
+
+QPushButton* MainWindow::GetPreviousButton()
+{
+    return this->findChild<QPushButton *>("prevButton");
 }
 
 void MainWindow::PopulateFileList()
