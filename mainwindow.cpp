@@ -79,18 +79,18 @@ void MainWindow::SelectStation(int station_index)
         this->DisplayError("Station ID out of range");
         return;
     }
-    QDir dir = QDir::currentPath();
-    this->DisplayError(dir.cleanPath(dir.absoluteFilePath(this->stationFiles[station_index])));
-    player->setMedia(QUrl::fromLocalFile(dir.cleanPath(dir.absoluteFilePath(this->stationFiles[station_index]))));
+
+    player->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
 }
 
 void MainWindow::PopulateFileList()
 {
-    QString dir = "../";
-    QDirIterator it(dir, QStringList() << "*.mp3", QDir::Files, QDirIterator::Subdirectories);
+    QString dir_path = "../";
+    QDirIterator it(dir_path, QStringList() << "*.mp3", QDir::Files, QDirIterator::Subdirectories);
+    QDir dir = QDir::currentPath();
     while (it.hasNext())
     {
-        this->stationFiles[stationFileCount] = it.next();
+        this->stationFiles[stationFileCount] = dir.cleanPath(dir.absoluteFilePath(it.next()));
         this->stationFileCount ++;
     }
 }
