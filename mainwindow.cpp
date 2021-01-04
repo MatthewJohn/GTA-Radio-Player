@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->player = new QMediaPlayer;
 
     this->SetVolume(INITIAL_VOLUME);
+    this->GetVolumeDial()->setValue(INITIAL_VOLUME);
 
     // Select initial station
     if (this->IsPlayAvailable())
@@ -81,6 +82,11 @@ void MainWindow::SelectStation(int station_index)
     }
 
     player->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
+}
+
+QDial* MainWindow::GetVolumeDial()
+{
+    return this->findChild<QDial *>("volumeDial");
 }
 
 void MainWindow::PopulateFileList()

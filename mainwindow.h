@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QMediaPlayer>
 #include <QMessageBox>
+#include <QDial>
 
 #define MAX_STATIONS 20
 #define INITIAL_VOLUME 50
@@ -49,6 +50,8 @@ private:
     void SelectStation(int station_index);
     void NextStation();
     void PreviousStation();
+
+    QDial* GetVolumeDial();
 
     void DisplayError(QString err);
 
