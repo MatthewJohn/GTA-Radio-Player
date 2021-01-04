@@ -71,3 +71,10 @@ Thumbs.db
 *.dll
 *.exe
 
+# Builds
+build-gta-radio-player-Desktop-Debug/*
+
+# Media files
+*.mp3
+*.webm
+
