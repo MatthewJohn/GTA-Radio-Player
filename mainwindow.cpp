@@ -215,7 +215,7 @@ QPushButton* MainWindow::GetPreviousButton()
 
 void MainWindow::PopulateFileList()
 {
-    QString dir_path = "../";
+    QString dir_path = "./";
     QDirIterator it(dir_path, QStringList() << "*.mp3", QDir::Files, QDirIterator::Subdirectories);
     QDir dir = QDir::currentPath();
     while (it.hasNext())

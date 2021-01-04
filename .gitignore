@@ -78,3 +78,7 @@ build-gta-radio-player-Desktop-Debug/*
 *.mp3
 *.webm
 
+# Buid files
+moc_predefs.h
+gta-radio-player
+
