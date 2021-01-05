@@ -169,13 +169,8 @@ void MainWindow::NextStation()
     if (! this->IsPlayAvailable())
         return;
 
-    int new_station_id;
     // If end of station index, start from 0
-    if (currentStation == (this->stationFileCount - 1))
-        new_station_id = 0;
-    else
-        new_station_id = currentStation + 1;
-    this->SelectStation(new_station_id);
+    this->SelectStation((currentStation == (this->stationFileCount - 1)) ? 0 : currentStation + 1);
 }
 
 void MainWindow::PreviousStation()
@@ -183,12 +178,9 @@ void MainWindow::PreviousStation()
     if (! this->IsPlayAvailable())
         return;
 
-    int new_station_id;
-    if (currentStation == 0)
-        new_station_id = (this->stationFileCount - 1);
-    else
-        new_station_id = currentStation - 1;
-    this->SelectStation(new_station_id);
+    this->SelectStation(
+        (currentStation == 0) ? (this->stationFileCount - 1) : (currentStation - 1)
+    );
 
 }
 
