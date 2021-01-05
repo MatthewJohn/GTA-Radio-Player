@@ -11,6 +11,9 @@
 #include <QDateTime>
 #include <QPushButton>
 #include <QTextBrowser>
+#include <QAction>
+#include <QFileDialog>
+#include <QMenuBar>
 
 #define MAX_STATIONS 20
 #define INITIAL_VOLUME 40
@@ -18,6 +21,12 @@
 #define MEDIA_LOAD_WAIT_PERIOD 100
 #define PLAY_PAUSE_BUTTON_TEXT_PLAY "Play"
 #define PLAY_PAUSE_BUTTON_TEXT_PAUSE "Pause"
+
+#ifdef _WIN32
+#define INITIAL_DIRECTORY "."
+#else
+#define INITIAL_DIRECTORY "./"
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,6 +45,7 @@ public slots:
     void NextStation();
     void PreviousStation();
     void VolumeDialChangeSlot();
+    void OpenChangeDirectory();
 
 private:
     Ui::MainWindow *ui;
@@ -45,6 +55,10 @@ private:
 
     // Index of current stations
     int currentStation;
+
+    QMenuBar *menu_bar;
+    QMenu *file_menu;
+    QAction *change_directory_action;
 
     // player object
     QMediaPlayer *players[2];
@@ -56,9 +70,12 @@ private:
     // List of stations
     QString stationFiles[MAX_STATIONS];
     int stationFileCount;
+    // Directory to scan for MP3s
+    QString scan_directory;
 
     // Populate list of station files
     void PopulateFileList();
+    void UpdateDirectory(QString new_directory);
 
     qint64 startupTime;
 

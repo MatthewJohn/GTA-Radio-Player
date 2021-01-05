@@ -12,7 +12,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->playing = false;
 
     this->stationFileCount = 0;
-    this->PopulateFileList();
     this->players[0] = new QMediaPlayer;
     this->players[1] = new QMediaPlayer;
     this->currentPlayerItx = 0;
@@ -24,15 +23,50 @@ MainWindow::MainWindow(QWidget *parent)
     this->startupTime = QDateTime::currentMSecsSinceEpoch();
 
     // Select initial station
-    if (this->IsPlayAvailable())
-        this->SelectStation(0);
+    this->UpdateDirectory(INITIAL_DIRECTORY);
     this->PlayPauseButtonSlot();
+
+    this->change_directory_action = new QAction(0);
+    this->change_directory_action->setText("Change Directory");
+    this->file_menu = new QMenu();
+    this->file_menu->setTitle("File");
+    this->file_menu->addAction(this->change_directory_action);
+    this->menu_bar = new QMenuBar(0);
+    this->menu_bar->setNativeMenuBar(false);
+    this->menu_bar->addMenu(this->file_menu);
+    this->setMenuBar(this->menu_bar);
 
     // Bind knobs
     QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(PlayPauseButtonSlot()));
     QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(NextStation()));
     QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(PreviousStation()));
     QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged(int)), this, SLOT(VolumeDialChangeSlot()));
+
+    // Menu item
+    QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
+}
+
+void MainWindow::UpdateDirectory(QString new_directory)
+{
+    this->scan_directory = new_directory;
+    this->PopulateFileList();
+    if (this->IsPlayAvailable())
+        this->SelectStation(0);
+}
+
+void MainWindow::OpenChangeDirectory()
+{
+    QFileDialog dialog(this);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOption(QFileDialog::ShowDirsOnly, true);
+    dialog.selectFile(this->scan_directory);
+    dialog.exec();
+    QStringList selected = dialog.selectedFiles();
+    if (selected.count())
+    {
+        this->UpdateDirectory(selected[0]);
+    }
 }
 
 QMediaPlayer* MainWindow::GetCurrentPlayer()
@@ -50,7 +84,7 @@ void MainWindow::FlipPlayer()
 
 void MainWindow::PlayPauseButtonSlot()
 {
-    if (this->IsPlaying())
+    if (this->IsPlaying() || ! this->IsPlayAvailable())
     {
         this->GetCurrentPlayer()->pause();
         this->GetPlayPauseButton()->setText(PLAY_PAUSE_BUTTON_TEXT_PLAY);
@@ -218,8 +252,7 @@ QPushButton* MainWindow::GetPreviousButton()
 
 void MainWindow::PopulateFileList()
 {
-    QString dir_path = "./";
-    QDirIterator it(dir_path, QStringList() << "*.mp3", QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator it(this->scan_directory, QStringList() << "*.mp3", QDir::Files, QDirIterator::Subdirectories);
     QDir dir = QDir::currentPath();
     while (it.hasNext())
     {

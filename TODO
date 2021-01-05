@@ -1,7 +1,6 @@
 
 # Immediate
 Fix double clicking next/previous (i.e. before next station completes)
-Fix VolumeDial bind
 Allow change of path
 Save current volume/path on exit for loading via settings
 
