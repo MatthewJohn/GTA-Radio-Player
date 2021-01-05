@@ -6,6 +6,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QCoreApplication::setApplicationName("GTA Radio Player");
+    this->setWindowTitle("GTA Radio Player");
+
     this->playing = false;
 
     this->stationFileCount = 0;
