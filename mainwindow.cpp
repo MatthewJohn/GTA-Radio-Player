@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(PlayPauseButtonSlot()));
     QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(NextStation()));
     QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(PreviousStation()));
-    QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged()), this, SLOT(VolumeDialChangeSlot()));
+    QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged(int)), this, SLOT(VolumeDialChangeSlot()));
 }
 
 QMediaPlayer* MainWindow::GetCurrentPlayer()
