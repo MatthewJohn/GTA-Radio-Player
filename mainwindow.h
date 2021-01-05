@@ -24,8 +24,10 @@
 #define PLAY_PAUSE_BUTTON_TEXT_PAUSE "Pause"
 #define SETTINGS_KEY_VOLUME "player/volume"
 #define SETTINGS_KEY_DIRECTORY "player/directory"
+#define SETTINGS_KEY_ALWAYS_ON_TOP "window/always_on_top"
 #define ORGANISATION "MatthewJohn"
 #define APP_NAME "GTA Radio Player"
+#define DEFAULT_ALWAYS_ON_TOP 0
 
 #ifdef _WIN32
 #define INITIAL_DIRECTORY "."
@@ -46,11 +48,14 @@ public:
     ~MainWindow();
 
 public slots:
+    // Slots for controls
     void PlayPauseButtonSlot();
     void NextStation();
     void PreviousStation();
     void VolumeDialChangeSlot();
+    // Slots for menu items
     void OpenChangeDirectory();
+    void ToggleAlwaysOnTop(bool new_value);
 
 private:
     Ui::MainWindow *ui;
@@ -65,6 +70,7 @@ private:
     QMenuBar *menu_bar;
     QMenu *file_menu;
     QAction *change_directory_action;
+    QAction *always_on_top_action;
 
     // Settings
     QSettings *settings;
@@ -106,6 +112,7 @@ private:
     QPushButton* GetPreviousButton();
 
     void DisplayError(QString err);
+    void DisplayInfo(QString info);
 
 };
 #endif // MAINWINDOW_H

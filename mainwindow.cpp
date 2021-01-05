@@ -6,10 +6,15 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     QCoreApplication::setApplicationName("GTA Radio Player");
     this->setWindowTitle("GTA Radio Player");
 
     this->settings = new QSettings(ORGANISATION, APP_NAME);
+
+    bool always_on_top_set = (this->settings->value(SETTINGS_KEY_ALWAYS_ON_TOP, DEFAULT_ALWAYS_ON_TOP).toInt() == 1);
+    if (always_on_top_set)
+        setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
     this->playing = false;
 
@@ -29,9 +34,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->change_directory_action = new QAction(0);
     this->change_directory_action->setText("Change Directory");
+    this->always_on_top_action = new QAction(0);
+    this->always_on_top_action->setText("Always on top");
+    this->always_on_top_action->setCheckable(true);
+    this->always_on_top_action->setChecked(always_on_top_set);
     this->file_menu = new QMenu();
     this->file_menu->setTitle("File");
     this->file_menu->addAction(this->change_directory_action);
+    this->file_menu->addAction(this->always_on_top_action);
     this->menu_bar = new QMenuBar(0);
     this->menu_bar->setNativeMenuBar(false);
     this->menu_bar->addMenu(this->file_menu);
@@ -45,6 +55,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Menu item
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
+    QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
+
 }
 
 void MainWindow::UpdateDirectory(QString new_directory)
@@ -78,6 +90,12 @@ void MainWindow::OpenChangeDirectory()
     {
         this->UpdateDirectory(selected[0]);
     }
+}
+
+void MainWindow::ToggleAlwaysOnTop(bool new_value)
+{
+    this->settings->setValue(SETTINGS_KEY_ALWAYS_ON_TOP, new_value ? 1 : 0);
+    this->DisplayInfo("Application must be restarted for changes to take effect.");
 }
 
 QMediaPlayer* MainWindow::GetCurrentPlayer()
@@ -175,6 +193,13 @@ void MainWindow::DisplayError(QString err)
 {
     QMessageBox messageBox;
     messageBox.critical(0, "Error", err);
+    messageBox.setFixedSize(500, 200);
+}
+
+void MainWindow::DisplayInfo(QString info)
+{
+    QMessageBox messageBox;
+    messageBox.information(0, "Info", info);
     messageBox.setFixedSize(500, 200);
 }
 
