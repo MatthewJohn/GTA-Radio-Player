@@ -1,7 +1,6 @@
 
 # Immediate
 Fix double clicking next/previous (i.e. before next station completes)
-Allow change of path
 Save current volume/path on exit for loading via settings
 
 Make window semi-transparent
