@@ -25,6 +25,7 @@
 #define SETTINGS_KEY_VOLUME "player/volume"
 #define SETTINGS_KEY_DIRECTORY "player/directory"
 #define SETTINGS_KEY_ALWAYS_ON_TOP "window/always_on_top"
+#define SETTINGS_KEY_START_EPOC "player/start_epoc"
 #define ORGANISATION "MatthewJohn"
 #define APP_NAME "GTA Radio Player"
 #define DEFAULT_ALWAYS_ON_TOP 0

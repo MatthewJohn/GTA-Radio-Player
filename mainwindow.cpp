@@ -26,7 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
     this->VolumeDialChangeSlot();
 
     // Set startup time
-    this->startupTime = QDateTime::currentMSecsSinceEpoch();
+    qint64 current_epoc = QDateTime::currentMSecsSinceEpoch();  // Get current EPOC
+    this->startupTime = this->settings->value(SETTINGS_KEY_START_EPOC, current_epoc).toLongLong();  // Obtain stored value, using current epoc as default
+    if (this->startupTime == current_epoc)
+        this->settings->setValue(SETTINGS_KEY_START_EPOC, current_epoc);  // If setting used the deafult, save it.
 
     // Select initial station
     this->UpdateDirectory(this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString());
