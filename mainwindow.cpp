@@ -9,20 +9,22 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setApplicationName("GTA Radio Player");
     this->setWindowTitle("GTA Radio Player");
 
+    this->settings = new QSettings(ORGANISATION, APP_NAME);
+
     this->playing = false;
 
     this->players[0] = new QMediaPlayer;
     this->players[1] = new QMediaPlayer;
     this->currentPlayerItx = 0;
 
-    this->GetVolumeDial()->setValue(INITIAL_VOLUME);
+    this->GetVolumeDial()->setValue(this->settings->value(SETTINGS_KEY_VOLUME, INITIAL_VOLUME).toInt());
     this->VolumeDialChangeSlot();
 
     // Set startup time
     this->startupTime = QDateTime::currentMSecsSinceEpoch();
 
     // Select initial station
-    this->UpdateDirectory(INITIAL_DIRECTORY);
+    this->UpdateDirectory(this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString());
     this->PlayPauseButtonSlot();
 
     this->change_directory_action = new QAction(0);
@@ -47,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::UpdateDirectory(QString new_directory)
 {
+    this->settings->setValue(SETTINGS_KEY_DIRECTORY, new_directory);
     this->scan_directory = new_directory;
     this->PopulateFileList();
     if (this->IsPlayAvailable())
@@ -238,8 +241,14 @@ QDial* MainWindow::GetVolumeDial()
 
 void MainWindow::VolumeDialChangeSlot()
 {
-    this->GetCurrentPlayer()->setVolume(this->GetVolumeDial()->value());
-    this->GetNextPlayer()->setVolume(this->GetVolumeDial()->value());
+    int new_volume = this->GetVolumeDial()->value();
+
+    // Save new volume value
+    this->settings->setValue(SETTINGS_KEY_VOLUME, QVariant(new_volume));
+
+    // Set volume of both players
+    this->GetCurrentPlayer()->setVolume(new_volume);
+    this->GetNextPlayer()->setVolume(new_volume);
 }
 
 QPushButton* MainWindow::GetPlayPauseButton()

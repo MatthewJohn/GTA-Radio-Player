@@ -14,6 +14,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QMenuBar>
+#include <QSettings>
 
 #define MAX_STATIONS 20
 #define INITIAL_VOLUME 40
@@ -21,6 +22,10 @@
 #define MEDIA_LOAD_WAIT_PERIOD 100
 #define PLAY_PAUSE_BUTTON_TEXT_PLAY "Play"
 #define PLAY_PAUSE_BUTTON_TEXT_PAUSE "Pause"
+#define SETTINGS_KEY_VOLUME "player/volume"
+#define SETTINGS_KEY_DIRECTORY "player/directory"
+#define ORGANISATION "MatthewJohn"
+#define APP_NAME "GTA Radio Player"
 
 #ifdef _WIN32
 #define INITIAL_DIRECTORY "."
@@ -56,9 +61,13 @@ private:
     // Index of current stations
     int currentStation;
 
+    // Menu items
     QMenuBar *menu_bar;
     QMenu *file_menu;
     QAction *change_directory_action;
+
+    // Settings
+    QSettings *settings;
 
     // player object
     QMediaPlayer *players[2];
