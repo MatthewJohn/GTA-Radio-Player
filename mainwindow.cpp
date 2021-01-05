@@ -146,7 +146,7 @@ void MainWindow::Play()
         return;
 
     // No stations available
-    if (this->stationFileCount == 0)
+    if (! this->IsPlayAvailable())
         return;
 
     this->GetCurrentPlayer()->play();
