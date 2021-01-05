@@ -75,6 +75,7 @@ private:
 
     // Populate list of station files
     void PopulateFileList();
+    void DisablePlayer();
     void UpdateDirectory(QString new_directory);
 
     qint64 startupTime;

@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->playing = false;
 
-    this->stationFileCount = 0;
     this->players[0] = new QMediaPlayer;
     this->players[1] = new QMediaPlayer;
     this->currentPlayerItx = 0;
@@ -52,6 +51,15 @@ void MainWindow::UpdateDirectory(QString new_directory)
     this->PopulateFileList();
     if (this->IsPlayAvailable())
         this->SelectStation(0);
+    else
+        this->DisablePlayer();
+}
+
+void MainWindow::DisablePlayer()
+{
+    this->SetDisplay("No tracks found...");
+    this->GetCurrentPlayer()->pause();
+    this->GetNextPlayer()->pause();
 }
 
 void MainWindow::OpenChangeDirectory()
@@ -252,6 +260,12 @@ QPushButton* MainWindow::GetPreviousButton()
 
 void MainWindow::PopulateFileList()
 {
+    // Clear old files
+    this->stationFileCount = 0;
+    for (int itx = 0; itx < MAX_STATIONS; itx ++)
+        this->stationFiles[itx] = "";
+
+    // Setup directory iterator
     QDirIterator it(this->scan_directory, QStringList() << "*.mp3", QDir::Files, QDirIterator::Subdirectories);
     QDir dir = QDir::currentPath();
     while (it.hasNext())
