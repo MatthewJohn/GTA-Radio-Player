@@ -299,6 +299,12 @@ void MainWindow::PopulateFileList()
     {
         this->stationFiles[stationFileCount] = dir.cleanPath(dir.absoluteFilePath(it.next()));
         this->stationFileCount ++;
+        // Check if reached array limit for stations
+        if (this->stationFileCount == MAX_STATIONS)
+        {
+            this->DisplayError("Reached maximum number of stations.");
+            return;
+        }
     }
 }
 
