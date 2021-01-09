@@ -20,8 +20,8 @@
 #define INITIAL_VOLUME 40
 #define STATION_CHANGE_DRAMATIC_PAUSE_DURATION 300
 #define MEDIA_LOAD_WAIT_PERIOD 100
-#define PLAY_PAUSE_BUTTON_TEXT_PLAY "Play"
-#define PLAY_PAUSE_BUTTON_TEXT_PAUSE "Pause"
+#define MUTE_BUTTON_TEXT_MUTE "Mute"
+#define MUTE_BUTTON_TEXT_UNMUTE "Unmute"
 #define SETTINGS_KEY_VOLUME "player/volume"
 #define SETTINGS_KEY_DIRECTORY "player/directory"
 #define SETTINGS_KEY_ALWAYS_ON_TOP "window/always_on_top"
@@ -50,7 +50,7 @@ public:
 
 public slots:
     // Slots for controls
-    void PlayPauseButtonSlot();
+    void MuteButtonSlot();
     void NextStation();
     void PreviousStation();
     void VolumeDialChangeSlot();
@@ -98,7 +98,7 @@ private:
 
     // Play
     void Play();
-    void Pause();
+    void SetMute(bool muted);
     void SetVolume(qint64 new_volume);
     bool IsPlayAvailable();
     bool IsPlaying();
@@ -108,7 +108,7 @@ private:
     void SetDisplay(QString text);
 
     QDial* GetVolumeDial();
-    QPushButton* GetPlayPauseButton();
+    QPushButton* GetMuteButton();
     QPushButton* GetNextButton();
     QPushButton* GetPreviousButton();
 

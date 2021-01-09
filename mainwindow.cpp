@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Select initial station
     this->UpdateDirectory(this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString());
-    this->PlayPauseButtonSlot();
+    this->Play();
 
     this->change_directory_action = new QAction(0);
     this->change_directory_action->setText("Change Directory");
@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setMenuBar(this->menu_bar);
 
     // Bind knobs
-    QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(PlayPauseButtonSlot()));
+    QObject::connect(this->GetMuteButton(), SIGNAL(clicked()), this, SLOT(MuteButtonSlot()));
     QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(NextStation()));
     QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(PreviousStation()));
     QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged(int)), this, SLOT(VolumeDialChangeSlot()));
@@ -114,15 +114,15 @@ void MainWindow::FlipPlayer()
     this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
 }
 
-void MainWindow::PlayPauseButtonSlot()
+void MainWindow::MuteButtonSlot()
 {
-    if (this->IsPlaying() || ! this->IsPlayAvailable())
+    if (this->GetCurrentPlayer()->isMuted())
     {
-        this->GetCurrentPlayer()->pause();
-        this->GetPlayPauseButton()->setText(PLAY_PAUSE_BUTTON_TEXT_PLAY);
+        this->SetMute(false);
+        this->GetMuteButton()->setText(MUTE_BUTTON_TEXT_MUTE);
     } else {
-        this->Play();
-        this->GetPlayPauseButton()->setText(PLAY_PAUSE_BUTTON_TEXT_PAUSE);
+        this->SetMute(true);
+        this->GetMuteButton()->setText(MUTE_BUTTON_TEXT_UNMUTE);
     }
 }
 
@@ -156,12 +156,10 @@ void MainWindow::Play()
         this->DisplayError("Not playing");
 }
 
-void MainWindow::Pause()
+void MainWindow::SetMute(bool muted)
 {
-    if (! this->IsPlaying())
-        return;
-
-    this->GetCurrentPlayer()->pause();
+    this->GetCurrentPlayer()->setMuted(muted);
+    this->GetNextPlayer()->setMuted(muted);
 }
 
 void MainWindow::NextStation()
@@ -271,9 +269,9 @@ void MainWindow::VolumeDialChangeSlot()
     this->GetNextPlayer()->setVolume(new_volume);
 }
 
-QPushButton* MainWindow::GetPlayPauseButton()
+QPushButton* MainWindow::GetMuteButton()
 {
-    return this->findChild<QPushButton *>("playPauseButton");
+    return this->findChild<QPushButton *>("muteButton");
 }
 
 QPushButton* MainWindow::GetNextButton()

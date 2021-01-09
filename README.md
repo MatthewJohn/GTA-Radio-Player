@@ -22,3 +22,8 @@ Run the radio station:
 
     ./gta-radio-station
 
+
+Notes:
+
+ - Based around QT 5.12.8
+
