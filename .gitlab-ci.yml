@@ -1,0 +1,15 @@
+
+image: ubuntu:latest
+
+before_script:
+  - apt-get update
+  - apt-get install --assume-yes make autoconf qt5-qmake qt5-default qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5
+
+build:
+  stage: build
+  script:
+    - qmake -makefile -o Makefile
+    - make
+  artifacts:
+    paths:
+      - gta-radio-player
