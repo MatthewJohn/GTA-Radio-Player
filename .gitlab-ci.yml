@@ -18,6 +18,7 @@ build:
       - gta-radio-player
 
 sonarqube-check:
+  stage: sonarqube-check
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
