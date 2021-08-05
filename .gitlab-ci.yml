@@ -1,6 +1,10 @@
 
 image: ubuntu:latest
 
+stages:
+  - build
+  - sonarqube-check
+
 before_script:
   - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes g++ make autoconf qt5-qmake qt5-default qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5
 
