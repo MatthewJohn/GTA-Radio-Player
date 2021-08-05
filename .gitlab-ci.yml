@@ -12,7 +12,7 @@ sonarqube-check:
     paths:
       - .sonar/cache
   before_script:
-    - apk update && apk add g++ make autoconf qt5-qtbase-dev qt5-qtmultimedia qt5-qtmultimedia-dev
+    - http_proxy=$HTTP_PROXY https_proxy=$HTTPS_PROXY apk update && http_proxy=$HTTP_PROXY https_proxy=$HTTPS_PROXY apk add g++ make autoconf qt5-qtbase-dev qt5-qtmultimedia qt5-qtmultimedia-dev
   script:
     - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.cxx.includeDirectories='/usr/include/qt5/QtCore/5.15.3' -Dsonar.lang.patterns.c='**/*.doesntexist' -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
   only:
