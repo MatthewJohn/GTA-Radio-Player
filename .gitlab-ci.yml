@@ -25,7 +25,7 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.lang.patterns.c= -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
   allow_failure: true
   only:
     - merge_requests
