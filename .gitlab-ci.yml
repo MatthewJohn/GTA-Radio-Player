@@ -5,7 +5,7 @@ before_script:
 
 sonarqube-check:
   image:
-    name: fare-docker-reg.dock.studios:5000/dockerimages/sonarscanner-cli-ubuntu:20-04_7
+    name: registry.gitlab.dockstudios.co.uk/pub/docker-images/sonarcanner-cli-ubuntu:latest
     entrypoint: [""]
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
