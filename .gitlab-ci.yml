@@ -1,8 +1,11 @@
 
 
+before_script:
+  - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes g++ make autoconf qt5-qmake qt5-default qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5
+
 sonarqube-check:
   image:
-    name: sonarsource/sonar-scanner-cli:latest
+    name: fare-docker-reg.dock.studios:5000/dockerimages/sonarscanner-cli-ubuntu:20-04_7
     entrypoint: [""]
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
@@ -11,8 +14,6 @@ sonarqube-check:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
-  before_script:
-    - sed -i 's/https/http/g' /etc/apk/repositories && apk add --update-cache --repositories-file=/etc/apk/repositories g++ make autoconf qt5-qtbase-dev qt5-qtmultimedia qt5-qtmultimedia-dev
   script:
     - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.cxx.includeDirectories='/usr/include/qt5/QtCore/5.15.3' -Dsonar.lang.patterns.c='**/*.doesntexist' -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
   only:
@@ -23,8 +24,6 @@ sonarqube-check:
 build:
   stage: build
   image: ubuntu:latest
-  before_script:
-    - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes g++ make autoconf qt5-qmake qt5-default qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5
   script:
     - qmake -makefile -o Makefile
     - make
