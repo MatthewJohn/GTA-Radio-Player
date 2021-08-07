@@ -15,7 +15,7 @@ sonarqube-check:
     paths:
       - .sonar/cache
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.cxx.includeDirectories='/usr/include/qt5/QtCore/5.15.3' -Dsonar.lang.patterns.c='**/*.doesntexist' -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.cxx.includeDirectories='/usr/include/x86_64-linux-gnu/qt5' -Dsonar.lang.patterns.c='**/*.doesntexist' -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
   only:
     - merge_requests
     - master
