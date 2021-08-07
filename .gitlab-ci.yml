@@ -34,5 +34,6 @@ sonarqube-check:
   only:
     - merge_requests
     - master
-
+  depedencies:
+    - build
 
