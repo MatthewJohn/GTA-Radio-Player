@@ -168,7 +168,7 @@ void MainWindow::NextStation()
         return;
 
     // If end of station index, start from 0
-    this->SelectStation((currentStation == (this->stationFileCount - 1)) ? 0 : currentStation + 1);
+    this->SelectStation((this->currentStation == (this->stationFileCount - 1)) ? 0 : this->currentStation + 1);
 }
 
 void MainWindow::PreviousStation()
@@ -177,7 +177,7 @@ void MainWindow::PreviousStation()
         return;
 
     this->SelectStation(
-        (currentStation == 0) ? (this->stationFileCount - 1) : (currentStation - 1)
+        (this->currentStation == 0) ? (this->stationFileCount - 1) : (this->    currentStation - 1)
     );
 
 }
