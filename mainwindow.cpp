@@ -12,12 +12,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->settings = new QSettings(ORGANISATION, APP_NAME);
 
-    bool always_on_top_set = (this->settings->value(SETTINGS_KEY_ALWAYS_ON_TOP, DEFAULT_ALWAYS_ON_TOP).toInt() == 1);
+    // Obtain config for 'always on top' and, if set, enable QT
+    // window flag for always on top
+    bool always_on_top_set = this->settings->value(SETTINGS_KEY_ALWAYS_ON_TOP, DEFAULT_ALWAYS_ON_TOP).toInt() == 1;
     if (always_on_top_set)
         setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
     this->playing = false;
 
+    // Create player objects and set current
+    // player index to first player
     this->players[0] = new QMediaPlayer;
     this->players[1] = new QMediaPlayer;
     this->currentPlayerItx = 0;
