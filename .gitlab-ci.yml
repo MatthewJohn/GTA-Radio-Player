@@ -1,9 +1,24 @@
 
+stages:
+  - build
+  - test
 
 before_script:
   - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes g++ make autoconf qt5-qmake qt5-default qtmultimedia5-dev libqt5multimediawidgets5 libqt5multimedia5-plugins libqt5multimedia5
 
+
+build:
+  stage: build
+  image: ubuntu:latest
+  script:
+    - qmake -makefile -o Makefile
+    - make
+  artifacts:
+    paths:
+      - gta-radio-player
+
 sonarqube-check:
+  stage: test
   image:
     name: registry.gitlab.dockstudios.co.uk/pub/docker-images/sonarcanner-cli:ubuntu-20.04
     entrypoint: [""]
@@ -21,12 +36,3 @@ sonarqube-check:
     - master
 
 
-build:
-  stage: build
-  image: ubuntu:latest
-  script:
-    - qmake -makefile -o Makefile
-    - make
-  artifacts:
-    paths:
-      - gta-radio-player
