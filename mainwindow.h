@@ -27,6 +27,7 @@
 #define SETTINGS_KEY_DIRECTORY "player/directory"
 #define SETTINGS_KEY_ALWAYS_ON_TOP "window/always_on_top"
 #define SETTINGS_KEY_START_EPOC "player/start_epoc"
+#define SETTINGS_KEY_CURRENT_STATION_INDEX "player/station_index"
 #define ORGANISATION "MatthewJohn"
 #define APP_NAME "GTA Radio Player"
 #define DEFAULT_ALWAYS_ON_TOP 0
@@ -95,7 +96,7 @@ private:
     // Populate list of station files
     void PopulateFileList();
     void DisablePlayer();
-    void UpdateDirectory(QString new_directory);
+    void UpdateDirectory(QString new_directory, int station_index);
 
     qint64 startupTime;
 
@@ -107,6 +108,9 @@ private:
     bool IsPlaying();
     void SelectStation(int station_index);
     QString GetMediaName();
+
+    int LoadCurrentStation();
+    void SaveCurrentStation();
 
     bool mediaStateChangeInteruptEnabled;
     void DisableMediaInterupts();
