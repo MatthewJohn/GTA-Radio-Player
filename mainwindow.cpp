@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::OnMediaStateChange(QMediaPlayer::State newState) {
     std::cout << "New State: " << newState << std::endl;
-    if (this->mediaStateChangeInteruptEnabled) {
+    if (this->mediaStateChangeInteruptEnabled && newState == QMediaPlayer::StoppedState) {
         std::cout << "Interupts enabled, restarting current player" << std::endl;
         this->GetCurrentPlayer()->play();
     }
