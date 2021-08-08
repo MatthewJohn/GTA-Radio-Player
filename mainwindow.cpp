@@ -235,13 +235,9 @@ void MainWindow::DisplayInfo(QString info)
     messageBox.setFixedSize(500, 200);
 }
 
-void MainWindow::LoadCurrentStation()
+int MainWindow::LoadCurrentStation()
 {
-    int station = this->settings->value(SETTINGS_KEY_CURRENT_STATION_INDEX, 0).toInt();
-    std::cout << "Found station in persistent state: " << station << std::endl;
-    // If station index is valid (less than number of stations (index 0 = 1 file),
-    // then use station for current station, otherwise default to 0.
-    this->currentStation = (station < this->stationFileCount) ? station : 0;
+    return this->settings->value(SETTINGS_KEY_CURRENT_STATION_INDEX, 0).toInt();
 }
 
 void MainWindow::SaveCurrentStation()

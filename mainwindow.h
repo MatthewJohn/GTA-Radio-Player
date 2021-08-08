@@ -109,7 +109,7 @@ private:
     void SelectStation(int station_index);
     QString GetMediaName();
 
-    void LoadCurrentStation();
+    int LoadCurrentStation();
     void SaveCurrentStation();
 
     bool mediaStateChangeInteruptEnabled;
