@@ -26,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->players[1] = new QMediaPlayer;
     this->currentPlayerItx = 0;
 
+    // Disable interupts
+    this->mediaStateChangeInteruptEnabled = false;
+
     this->GetVolumeDial()->setValue(this->settings->value(SETTINGS_KEY_VOLUME, INITIAL_VOLUME).toInt());
     this->VolumeDialChangeSlot();
 
@@ -64,6 +67,24 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
 
+    // Listen to media events
+    QObject::connect(this->players[0], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
+    QObject::connect(this->players[1], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
+}
+
+void MainWindow::OnMediaStateChange(QMediaPlayer::State newState) {
+    std::cout << "New State: " << newState << std::endl;
+    if (this->mediaStateChangeInteruptEnabled && newState == QMediaPlayer::StoppedState) {
+        std::cout << "Interupts enabled, restarting current player" << std::endl;
+        this->GetCurrentPlayer()->play();
+    }
+}
+
+void MainWindow::DisableMediaInterupts() {
+    this->mediaStateChangeInteruptEnabled = false;
+}
+void MainWindow::EnableMediaInterupts() {
+    this->mediaStateChangeInteruptEnabled = true;
 }
 
 void MainWindow::UpdateDirectory(QString new_directory)
@@ -113,6 +134,7 @@ QMediaPlayer* MainWindow::GetNextPlayer()
 {
     return this->players[this->currentPlayerItx ? 0 : 1];
 }
+
 void MainWindow::FlipPlayer()
 {
     this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
@@ -158,6 +180,9 @@ void MainWindow::Play()
         this->DisplayError(this->GetCurrentPlayer()->errorString());
     else if (this->GetCurrentPlayer()->state() != QMediaPlayer::PlayingState)
         this->DisplayError("Not playing");
+
+    // Enable interupts, as no longer expecting media changes.
+    this->EnableMediaInterupts();
 }
 
 void MainWindow::SetMute(bool muted)
@@ -227,6 +252,8 @@ void MainWindow::SelectStation(int station_index)
             this->GetNextPlayer()->setPosition(tts % this->GetNextPlayer()->duration());
     }
 
+    this->DisableMediaInterupts();
+
     // Pause old player, start new one and flip
     bool was_playing = this->IsPlaying();
     if (was_playing)
@@ -240,6 +267,9 @@ void MainWindow::SelectStation(int station_index)
         this->GetNextPlayer()->play();
     }
     this->FlipPlayer();
+
+    this->EnableMediaInterupts();
+
     this->SetDisplay(this->GetMediaName());
 }
 

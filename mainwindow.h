@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <iostream>
 #include <QMainWindow>
 #include <QDirIterator>
 #include <QDebug>
@@ -57,6 +58,8 @@ public slots:
     // Slots for menu items
     void OpenChangeDirectory();
     void ToggleAlwaysOnTop(bool new_value);
+    // Slots for media events
+    void OnMediaStateChange(QMediaPlayer::State newState);
 
 private:
     Ui::MainWindow *ui;
@@ -104,6 +107,10 @@ private:
     bool IsPlaying();
     void SelectStation(int station_index);
     QString GetMediaName();
+
+    bool mediaStateChangeInteruptEnabled;
+    void DisableMediaInterupts();
+    void EnableMediaInterupts();
 
     void SetDisplay(QString text);
 
