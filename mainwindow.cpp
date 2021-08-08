@@ -39,7 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
         this->settings->setValue(SETTINGS_KEY_START_EPOC, current_epoc);  // If setting used the deafult, save it.
 
     // Select initial station
-    this->UpdateDirectory(this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString());
+    this->UpdateDirectory(this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString(), false);
+    this->LoadCurrentStation();
     this->Play();
 
     this->change_directory_action = new QAction(0);
@@ -87,13 +88,14 @@ void MainWindow::EnableMediaInterupts() {
     this->mediaStateChangeInteruptEnabled = true;
 }
 
-void MainWindow::UpdateDirectory(QString new_directory)
+void MainWindow::UpdateDirectory(QString new_directory, bool update_station)
 {
     this->settings->setValue(SETTINGS_KEY_DIRECTORY, new_directory);
     this->scan_directory = new_directory;
     this->PopulateFileList();
     if (this->IsPlayAvailable())
-        this->SelectStation(0);
+        if (update_station)
+            this->SelectStation(0);
     else
         this->DisablePlayer();
 }
@@ -116,7 +118,7 @@ void MainWindow::OpenChangeDirectory()
     QStringList selected = dialog.selectedFiles();
     if (selected.count())
     {
-        this->UpdateDirectory(selected[0]);
+        this->UpdateDirectory(selected[0], true);
     }
 }
 
@@ -225,6 +227,20 @@ void MainWindow::DisplayInfo(QString info)
     messageBox.setFixedSize(500, 200);
 }
 
+void MainWindow::LoadCurrentStation()
+{
+    int station = this->settings->value(SETTINGS_KEY_CURRENT_STATION_INDEX, 0).toInt();
+    std::cout << "Found station in persistent state: " << station << std::endl;
+    // If station index is valid (less than number of stations (index 0 = 1 file),
+    // then use station for current station, otherwise default to 0.
+    this->currentStation = (station < this->stationFileCount) ? station : 0;
+}
+
+void MainWindow::SaveCurrentStation()
+{
+    this->settings->setValue(SETTINGS_KEY_CURRENT_STATION_INDEX, this->currentStation);
+}
+
 void MainWindow::SelectStation(int station_index)
 {
     if (station_index >= this->stationFileCount)
@@ -234,6 +250,7 @@ void MainWindow::SelectStation(int station_index)
     }
 
     this->currentStation = station_index;
+    this->SaveCurrentStation();
 
     // Update file path of next player
     this->GetNextPlayer()->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
