@@ -32,7 +32,7 @@ sonarqube-check:
   script:
     - qmake -makefile -o Makefile
     - make
-    - sonar-scanner -X -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.cxx.includeDirectories='/usr/include/x86_64-linux-gnu/qt5/QtConcurrent,/usr/include/x86_64-linux-gnu/qt5/QtCore,/usr/include/x86_64-linux-gnu/qt5/QtDBus,/usr/include/x86_64-linux-gnu/qt5/QtGui,/usr/include/x86_64-linux-gnu/qt5/QtMultimedia,/usr/include/x86_64-linux-gnu/qt5/QtMultimediaWidgets,/usr/include/x86_64-linux-gnu/qt5/QtNetwork,/usr/include/x86_64-linux-gnu/qt5/QtOpenGL,/usr/include/x86_64-linux-gnu/qt5/QtOpenGLExtensions,/usr/include/x86_64-linux-gnu/qt5/QtPlatformHeaders,/usr/include/x86_64-linux-gnu/qt5/QtPrintSupport,/usr/include/x86_64-linux-gnu/qt5/QtSql,/usr/include/x86_64-linux-gnu/qt5/QtTest,/usr/include/x86_64-linux-gnu/qt5/QtWidgets,/usr/include/x86_64-linux-gnu/qt5/QtXml' -Dsonar.lang.patterns.c='**/*.doesntexist' -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
+    - sonar-scanner -X -Dsonar.qualitygate.wait=true -Dsonar.projectKey=gta-radio-player -Dsonar.sources=. -Dsonar.host.url=http://sonarqube.dock.studios -Dsonar.login=cb9e8e14cd3f76947c4207ecafd445ef4ad9b185
   only:
     - merge_requests
     - master
