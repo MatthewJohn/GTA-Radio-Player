@@ -145,8 +145,10 @@ void MainWindow::ResetGlobalTimer()
     if (! this->IsPlayAvailable())
         return;
 
-    // If end of station index, start from 0
-    this->SelectStation(this->currentStation);
+    // Pause current song
+    this->GetCurrentPlayer()->pause();
+    this->SetCurrentPlayerPosition();
+    this->GetCurrentPlayer()->play();
 }
 
 void MainWindow::SetStartupTime(bool force_reset)
