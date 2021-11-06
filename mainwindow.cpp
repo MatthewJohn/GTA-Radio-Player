@@ -97,8 +97,8 @@ void MainWindow::UpdateDirectory(QString new_directory, int station_index)
 
     if (station_index >= this->stationFileCount)
     {
-        std::cout << "Requested station count: " << station_index <<
-                     " new availabe. Max stations: " << this->stationFileCount << std::endl;
+        std::cout << "Warning: Requested station index: " << station_index <<
+                     " new availabe. Stations found: " << this->stationFileCount << std::endl;
         station_index = 0;
     }
 
@@ -113,6 +113,10 @@ void MainWindow::DisablePlayer()
     this->SetDisplay("No tracks found...");
     this->GetCurrentPlayer()->pause();
     this->GetNextPlayer()->pause();
+    this->GetMuteButton()->setEnabled(false);
+    this->GetPreviousButton()->setEnabled(false);
+    this->GetNextButton()->setEnabled(false);
+    this->GetVolumeDial()->setEnabled(false);
 }
 
 void MainWindow::OpenChangeDirectory()
