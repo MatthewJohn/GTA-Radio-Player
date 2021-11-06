@@ -151,10 +151,15 @@ void MainWindow::ResetGlobalTimer()
 void MainWindow::SetStartupTime(bool force_reset)
 {
     qint64 current_epoc = QDateTime::currentMSecsSinceEpoch();  // Get current EPOC
-    this->startupTime = this->settings->value(SETTINGS_KEY_START_EPOC, current_epoc).toLongLong();  // Obtain stored value, using current epoc as default
-    if (this->startupTime == current_epoc || force_reset)
-        this->settings->setValue(SETTINGS_KEY_START_EPOC, current_epoc);  // If setting used the deafult, save it.
+    this->startupTime = this->settings->value(SETTINGS_KEY_START_EPOC, 0).toLongLong();  // Obtain stored value, using current epoc as default
+    std::cout << "Loading startupTime from config: " << this->startupTime << std::endl;
 
+    if (this->startupTime == 0 || force_reset)
+    {
+        std::cout << "Resetting startupTime to epoc: " << current_epoc << std::endl;
+        this->startupTime = current_epoc;
+        this->settings->setValue(SETTINGS_KEY_START_EPOC, this->startupTime);  // If setting used the deafult, save it.
+    }
 }
 
 void MainWindow::ToggleAlwaysOnTop(bool new_value)
