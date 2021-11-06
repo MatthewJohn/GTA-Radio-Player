@@ -110,6 +110,7 @@ private:
     bool IsPlayAvailable();
     bool IsPlaying();
     void SelectStation(int station_index);
+    void SetCurrentPlayerPosition();
     QString GetMediaName();
 
     int LoadCurrentStation();

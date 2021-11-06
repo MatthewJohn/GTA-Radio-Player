@@ -314,16 +314,6 @@ void MainWindow::SelectStation(int station_index)
     while (this->GetNextPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
         QCoreApplication::processEvents(QEventLoop::AllEvents, MEDIA_LOAD_WAIT_PERIOD);
 
-    // Set position based on time since application startup, using modulus of track length.
-    // Ignore tts less than 0, maybe due to time change or race condition
-    qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
-    if (tts > 0)
-    {
-        qint64 dur = this->GetNextPlayer()->duration();
-        if (dur > 0)
-            this->GetNextPlayer()->setPosition(tts % this->GetNextPlayer()->duration());
-    }
-
     this->DisableMediaInterupts();
 
     // Pause old player, start new one and flip
@@ -332,18 +322,38 @@ void MainWindow::SelectStation(int station_index)
     {
         this->GetCurrentPlayer()->pause();
         this->SetDisplay("Re-tuning...");
+
         // Pause for dramatic effect!
         qint64 start_pause = QDateTime::currentMSecsSinceEpoch();
         while (QDateTime::currentMSecsSinceEpoch() < (start_pause + STATION_CHANGE_DRAMATIC_PAUSE_DURATION))
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        this->GetNextPlayer()->play();
     }
+
     this->FlipPlayer();
+
+    if (was_playing)
+    {
+        this->SetCurrentPlayerPosition();
+        this->GetCurrentPlayer()->play();
+    }
 
     this->EnableMediaInterupts();
 
     this->SetDisplay(this->GetMediaName());
     this->EnableMediaButtons();
+}
+
+void MainWindow::SetCurrentPlayerPosition()
+{
+    // Set position based on time since application startup, using modulus of track length.
+    // Ignore tts less than 0, maybe due to time change or race condition
+    qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
+    if (tts > 0)
+    {
+        qint64 dur = this->GetCurrentPlayer()->duration();
+        if (dur > 0)
+            this->GetCurrentPlayer()->setPosition(tts % this->GetCurrentPlayer()->duration());
+    }
 }
 
 QString MainWindow::GetMediaName()
