@@ -112,6 +112,9 @@ private:
     int LoadCurrentStation();
     void SaveCurrentStation();
 
+    void DisableMediaButtons();
+    void EnableMediaButtons();
+
     bool mediaStateChangeInteruptEnabled;
     void DisableMediaInterupts();
     void EnableMediaInterupts();

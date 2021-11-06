@@ -113,10 +113,7 @@ void MainWindow::DisablePlayer()
     this->SetDisplay("No tracks found...");
     this->GetCurrentPlayer()->pause();
     this->GetNextPlayer()->pause();
-    this->GetMuteButton()->setEnabled(false);
-    this->GetPreviousButton()->setEnabled(false);
-    this->GetNextButton()->setEnabled(false);
-    this->GetVolumeDial()->setEnabled(false);
+    this->DisableMediaButtons();
 }
 
 void MainWindow::OpenChangeDirectory()
@@ -177,6 +174,22 @@ bool MainWindow::IsPlaying()
         return false;
 
     return (this->GetCurrentPlayer()->state() == QMediaPlayer::PlayingState);
+}
+
+void MainWindow::DisableMediaButtons()
+{
+    this->GetMuteButton()->setEnabled(false);
+    this->GetPreviousButton()->setEnabled(false);
+    this->GetNextButton()->setEnabled(false);
+    this->GetVolumeDial()->setEnabled(false);
+}
+
+void MainWindow::EnableMediaButtons()
+{
+    this->GetMuteButton()->setEnabled(true);
+    this->GetPreviousButton()->setEnabled(true);
+    this->GetNextButton()->setEnabled(true);
+    this->GetVolumeDial()->setEnabled(true);
 }
 
 void MainWindow::Play()
@@ -251,9 +264,12 @@ void MainWindow::SaveCurrentStation()
 
 void MainWindow::SelectStation(int station_index)
 {
+    this->DisableMediaButtons();
+
     if (station_index >= this->stationFileCount)
     {
         this->DisplayError("Station ID out of range");
+        this->EnableMediaButtons();
         return;
     }
 
@@ -296,6 +312,7 @@ void MainWindow::SelectStation(int station_index)
     this->EnableMediaInterupts();
 
     this->SetDisplay(this->GetMediaName());
+    this->EnableMediaButtons();
 }
 
 QString MainWindow::GetMediaName()
