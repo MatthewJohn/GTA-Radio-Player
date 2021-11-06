@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->UpdateDirectory(
         this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString(),
         this->LoadCurrentStation());
+    this->SetCurrentPlayerPosition();
     this->Play();
 
     this->change_directory_action = new QAction(0);
