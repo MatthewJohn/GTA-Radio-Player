@@ -58,6 +58,7 @@ public slots:
     void VolumeDialChangeSlot();
     // Slots for menu items
     void OpenChangeDirectory();
+    void ResetGlobalTimer();
     void ToggleAlwaysOnTop(bool new_value);
     // Slots for media events
     void OnMediaStateChange(QMediaPlayer::State newState);
@@ -76,6 +77,7 @@ private:
     QMenu *file_menu;
     QAction *change_directory_action;
     QAction *always_on_top_action;
+    QAction *reset_global_timer;
 
     // Settings
     QSettings *settings;
@@ -99,6 +101,7 @@ private:
     void UpdateDirectory(QString new_directory, int station_index);
 
     qint64 startupTime;
+    void SetStartupTime(bool force_reset);
 
     // Play
     void Play();

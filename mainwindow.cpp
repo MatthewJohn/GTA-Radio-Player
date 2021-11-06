@@ -33,10 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->VolumeDialChangeSlot();
 
     // Set startup time
-    qint64 current_epoc = QDateTime::currentMSecsSinceEpoch();  // Get current EPOC
-    this->startupTime = this->settings->value(SETTINGS_KEY_START_EPOC, current_epoc).toLongLong();  // Obtain stored value, using current epoc as default
-    if (this->startupTime == current_epoc)
-        this->settings->setValue(SETTINGS_KEY_START_EPOC, current_epoc);  // If setting used the deafult, save it.
+    this->SetStartupTime(false);
 
     // Select initial station
     this->UpdateDirectory(
@@ -46,14 +43,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->change_directory_action = new QAction(0);
     this->change_directory_action->setText("Change Directory");
+
+    this->reset_global_timer = new QAction(0);
+    this->reset_global_timer->setText("Reset global timer");
+
     this->always_on_top_action = new QAction(0);
     this->always_on_top_action->setText("Always on top");
     this->always_on_top_action->setCheckable(true);
     this->always_on_top_action->setChecked(always_on_top_set);
+
     this->file_menu = new QMenu();
     this->file_menu->setTitle("File");
     this->file_menu->addAction(this->change_directory_action);
+    this->file_menu->addAction(this->reset_global_timer);
     this->file_menu->addAction(this->always_on_top_action);
+
     this->menu_bar = new QMenuBar(0);
     this->menu_bar->setNativeMenuBar(false);
     this->menu_bar->addMenu(this->file_menu);
@@ -67,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Menu item
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
+    QObject::connect(this->reset_global_timer, SIGNAL(triggered(bool)), this, SLOT(ResetGlobalTimer()));
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
 
     // Listen to media events
@@ -128,6 +133,32 @@ void MainWindow::OpenChangeDirectory()
     if (selected.count())
     {
         this->UpdateDirectory(selected[0], 0);
+    }
+}
+
+void MainWindow::ResetGlobalTimer()
+{
+    this->SetStartupTime(true);
+
+    // Restart current station
+    if (! this->IsPlayAvailable())
+        return;
+
+    // If end of station index, start from 0
+    this->SelectStation(this->currentStation);
+}
+
+void MainWindow::SetStartupTime(bool force_reset)
+{
+    qint64 current_epoc = QDateTime::currentMSecsSinceEpoch();  // Get current EPOC
+    this->startupTime = this->settings->value(SETTINGS_KEY_START_EPOC, 0).toLongLong();  // Obtain stored value, using current epoc as default
+    std::cout << "Loading startupTime from config: " << this->startupTime << std::endl;
+
+    if (this->startupTime == 0 || force_reset)
+    {
+        std::cout << "Resetting startupTime to epoc: " << current_epoc << std::endl;
+        this->startupTime = current_epoc;
+        this->settings->setValue(SETTINGS_KEY_START_EPOC, this->startupTime);  // If setting used the deafult, save it.
     }
 }
 
