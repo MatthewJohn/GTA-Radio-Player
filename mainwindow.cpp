@@ -355,8 +355,6 @@ QString MainWindow::GetMediaName()
         // Check if name contains a dot and attempt to remove
         if (name.indexOf('.') != -1) {
             for (int itx = name.length() - 1; itx > 1;  itx -- ) {
-                std::cout << "Remove cahracter" << std::endl;
-
                 bool extension_removed = name[itx] == '.';
                 name.truncate(itx);
                 if (extension_removed)
