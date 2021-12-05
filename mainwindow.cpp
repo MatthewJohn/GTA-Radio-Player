@@ -426,7 +426,7 @@ QString MainWindow::GetMediaName()
 
 void MainWindow::SetDisplay(QString text)
 {
-    this->findChild<QTextBrowser *>("display")->setText(text);
+    this->findChild<QLabel *>("display")->setText(text);
 }
 
 QDial* MainWindow::GetVolumeDial()
