@@ -201,15 +201,19 @@ void MainWindow::OnPositionChanged(qint64 new_position)
     {
         char label_text[20];
         long long new_pos_mins= std::floor(new_position / 60);
-        long long dur_pos_mins = std::floor(duration / 60);
+        long long new_pos_hrs = std::floor(new_pos_mins / 60);
+        long long dur_mins = std::floor(duration / 60);
+        long long dur_hrs = std::floor(dur_mins / 60);
 
         snprintf(
             label_text,
             20,
-            "%lld:%02lld / %lld:%02lld",
-            new_pos_mins,
+            "%lld:%02lld:%02lld / %lld:%02lld:%02lld",
+            new_pos_hrs,
+            new_pos_mins % 60,
             new_position % 60,
-            dur_pos_mins,
+            dur_hrs,
+            dur_mins % 60,
             duration % 60);
         this->GetPositionLabel()->setText(label_text);
     }
