@@ -100,7 +100,7 @@
      <string>Prev</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="positionLabel">
     <property name="geometry">
      <rect>
       <x>340</x>
