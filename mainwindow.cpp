@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->UpdateDirectory(
         this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString(),
         this->LoadCurrentStation());
+    this->SetCurrentPlayerPosition();
     this->Play();
 
     this->change_directory_action = new QAction(0);
@@ -144,8 +145,10 @@ void MainWindow::ResetGlobalTimer()
     if (! this->IsPlayAvailable())
         return;
 
-    // If end of station index, start from 0
-    this->SelectStation(this->currentStation);
+    // Pause current song
+    this->GetCurrentPlayer()->pause();
+    this->SetCurrentPlayerPosition();
+    this->GetCurrentPlayer()->play();
 }
 
 void MainWindow::SetStartupTime(bool force_reset)
@@ -180,6 +183,51 @@ QMediaPlayer* MainWindow::GetNextPlayer()
 void MainWindow::FlipPlayer()
 {
     this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
+
+    // Update slot for mediaChanged
+    if (this->position_change_connection != nullptr) {
+        disconnect(this->position_change_connection);
+    }
+    QObject::connect(this->GetCurrentPlayer(), SIGNAL(positionChanged(qint64)), this, SLOT(OnPositionChanged(qint64)));
+}
+
+void MainWindow::OnPositionChanged(qint64 new_position)
+{
+
+    qint64 duration = this->GetCurrentPlayer()->duration();
+    std::cout << new_position << "/" << duration << std::endl;
+
+    if (duration >= 1000)
+    {
+
+        duration = duration / 1000;
+
+        char label_text[20];
+        long long dur_mins = std::floor(duration / 60);
+        long long dur_hrs = std::floor(dur_mins / 60);
+        long long new_pos_mins = 0;
+        long long new_pos_hrs = 0;
+
+        if (new_position >= 1000) {
+            new_position = new_position / 1000;
+            new_pos_mins = std::floor(new_position / 60);
+            new_pos_hrs = std::floor(new_pos_mins / 60);
+        }
+
+        snprintf(
+            label_text,
+            20,
+            "%lld:%02lld:%02lld / %lld:%02lld:%02lld",
+            new_pos_hrs,
+            new_pos_mins % 60,
+            new_position % 60,
+            dur_hrs,
+            dur_mins % 60,
+            duration % 60);
+        this->GetPositionLabel()->setText(label_text);
+    } else {
+        this->GetPositionLabel()->setText("0:00:00 / 0:00:00");
+    }
 }
 
 void MainWindow::MuteButtonSlot()
@@ -314,16 +362,6 @@ void MainWindow::SelectStation(int station_index)
     while (this->GetNextPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
         QCoreApplication::processEvents(QEventLoop::AllEvents, MEDIA_LOAD_WAIT_PERIOD);
 
-    // Set position based on time since application startup, using modulus of track length.
-    // Ignore tts less than 0, maybe due to time change or race condition
-    qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
-    if (tts > 0)
-    {
-        qint64 dur = this->GetNextPlayer()->duration();
-        if (dur > 0)
-            this->GetNextPlayer()->setPosition(tts % this->GetNextPlayer()->duration());
-    }
-
     this->DisableMediaInterupts();
 
     // Pause old player, start new one and flip
@@ -332,13 +370,20 @@ void MainWindow::SelectStation(int station_index)
     {
         this->GetCurrentPlayer()->pause();
         this->SetDisplay("Re-tuning...");
+
         // Pause for dramatic effect!
         qint64 start_pause = QDateTime::currentMSecsSinceEpoch();
         while (QDateTime::currentMSecsSinceEpoch() < (start_pause + STATION_CHANGE_DRAMATIC_PAUSE_DURATION))
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        this->GetNextPlayer()->play();
     }
+
     this->FlipPlayer();
+
+    if (was_playing)
+    {
+        this->SetCurrentPlayerPosition();
+        this->GetCurrentPlayer()->play();
+    }
 
     this->EnableMediaInterupts();
 
@@ -346,11 +391,36 @@ void MainWindow::SelectStation(int station_index)
     this->EnableMediaButtons();
 }
 
+void MainWindow::SetCurrentPlayerPosition()
+{
+    // Set position based on time since application startup, using modulus of track length.
+    // Ignore tts less than 0, maybe due to time change or race condition
+    qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
+    if (tts > 0)
+    {
+        qint64 dur = this->GetCurrentPlayer()->duration();
+        if (dur > 0)
+            this->GetCurrentPlayer()->setPosition(tts % this->GetCurrentPlayer()->duration());
+    }
+}
+
 QString MainWindow::GetMediaName()
 {
     QString name = this->GetCurrentPlayer()->metaData(QMediaMetaData::Title).toString();
-    if (name.isEmpty())
+    if (name.isEmpty()) {
         name = this->GetCurrentPlayer()->currentMedia().canonicalUrl().fileName();
+
+        // Check if name contains a dot and attempt to remove
+        if (name.indexOf('.') != -1) {
+            for (int itx = name.length() - 1; itx > 1;  itx -- ) {
+                bool extension_removed = name[itx] == '.';
+                name.truncate(itx);
+                if (extension_removed)
+                    break;
+            }
+        }
+    }
+
     return name;
 }
 
@@ -390,6 +460,11 @@ QPushButton* MainWindow::GetNextButton()
 QPushButton* MainWindow::GetPreviousButton()
 {
     return this->findChild<QPushButton *>("prevButton");
+}
+
+QLabel* MainWindow::GetPositionLabel()
+{
+    return this->findChild<QLabel *>("positionLabel");
 }
 
 void MainWindow::PopulateFileList()

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
+    <width>512</width>
     <height>82</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>392</width>
+    <width>512</width>
     <height>82</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>392</width>
+    <width>512</width>
     <height>82</height>
    </size>
   </property>
@@ -35,7 +35,7 @@
    <widget class="QDial" name="volumeDial">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>460</x>
       <y>0</y>
       <width>50</width>
       <height>64</height>
@@ -104,6 +104,19 @@
     </property>
     <property name="margin">
      <number>0</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="positionLabel">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>20</y>
+      <width>120</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0:00:00 / 0:00:00</string>
     </property>
    </widget>
   </widget>
