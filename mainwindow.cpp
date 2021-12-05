@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->SetCurrentPlayerPosition();
     this->Play();
 
+    // Set background colour of display label
+    this->GetDisplay()->setStyleSheet("QLabel { background-color: white; margin: 1px; }");
+
     this->change_directory_action = new QAction(0);
     this->change_directory_action->setText("Change Directory");
 
@@ -424,9 +427,13 @@ QString MainWindow::GetMediaName()
     return name;
 }
 
+QLabel* MainWindow::GetDisplay() {
+    return this->findChild<QLabel *>("display");
+}
+
 void MainWindow::SetDisplay(QString text)
 {
-    this->findChild<QLabel *>("display")->setText(text);
+    this->GetDisplay()->setText(text);
 }
 
 QDial* MainWindow::GetVolumeDial()

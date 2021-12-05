@@ -133,6 +133,7 @@ private:
     QPushButton* GetNextButton();
     QPushButton* GetPreviousButton();
     QLabel* GetPositionLabel();
+    QLabel* GetDisplay();
 
     void DisplayError(QString err);
     void DisplayInfo(QString info);
