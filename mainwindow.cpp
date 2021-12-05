@@ -216,6 +216,8 @@ void MainWindow::OnPositionChanged(qint64 new_position)
             dur_mins % 60,
             duration % 60);
         this->GetPositionLabel()->setText(label_text);
+    } else {
+        this->GetPositionLabel()->setText("0:00:00 / 0:00:00");
     }
 }
 
