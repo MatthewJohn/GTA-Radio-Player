@@ -193,16 +193,26 @@ void MainWindow::FlipPlayer()
 
 void MainWindow::OnPositionChanged(qint64 new_position)
 {
-    qint64 duration = this->GetCurrentPlayer()->duration() / 1000;
-    new_position = new_position / 1000;
+
+    qint64 duration = this->GetCurrentPlayer()->duration();
     std::cout << new_position << "/" << duration << std::endl;
-    if (new_position > 0 && duration > 0)
+
+    if (duration >= 1000)
     {
+
+        duration = duration / 1000;
+
         char label_text[20];
-        long long new_pos_mins= std::floor(new_position / 60);
-        long long new_pos_hrs = std::floor(new_pos_mins / 60);
         long long dur_mins = std::floor(duration / 60);
         long long dur_hrs = std::floor(dur_mins / 60);
+        long long new_pos_mins = 0;
+        long long new_pos_hrs = 0;
+
+        if (new_position >= 1000) {
+            new_position = new_position / 1000;
+            new_pos_mins = std::floor(new_position / 60);
+            new_pos_hrs = std::floor(new_pos_mins / 60);
+        }
 
         snprintf(
             label_text,
