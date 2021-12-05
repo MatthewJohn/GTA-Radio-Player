@@ -204,7 +204,7 @@ void MainWindow::OnPositionChanged(qint64 new_position)
 
         duration = duration / 1000;
 
-        char label_text[20];
+        char label_text[59];
         long long dur_mins = std::floor(duration / 60);
         long long dur_hrs = std::floor(dur_mins / 60);
         long long new_pos_mins = 0;
@@ -218,7 +218,7 @@ void MainWindow::OnPositionChanged(qint64 new_position)
 
         snprintf(
             label_text,
-            20,
+            sizeof(label_text),
             "%lld:%02lld:%02lld / %lld:%02lld:%02lld",
             new_pos_hrs,
             new_pos_mins % 60,
