@@ -81,7 +81,7 @@
      <string>Prev</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="display">
     <property name="geometry">
      <rect>
       <x>200</x>
@@ -100,7 +100,7 @@
      <string>Station Name</string>
     </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string>GTA Radio Player</string>
     </property>
     <property name="margin">
      <number>0</number>
