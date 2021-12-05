@@ -407,8 +407,20 @@ void MainWindow::SetCurrentPlayerPosition()
 QString MainWindow::GetMediaName()
 {
     QString name = this->GetCurrentPlayer()->metaData(QMediaMetaData::Title).toString();
-    if (name.isEmpty())
+    if (name.isEmpty()) {
         name = this->GetCurrentPlayer()->currentMedia().canonicalUrl().fileName();
+
+        // Check if name contains a dot and attempt to remove
+        if (name.indexOf('.') != -1) {
+            for (int itx = name.length() - 1; itx > 1;  itx -- ) {
+                bool extension_removed = name[itx] == '.';
+                name.truncate(itx);
+                if (extension_removed)
+                    break;
+            }
+        }
+    }
+
     return name;
 }
 
