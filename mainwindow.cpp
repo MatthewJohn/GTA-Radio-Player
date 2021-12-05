@@ -195,7 +195,6 @@ void MainWindow::OnPositionChanged(qint64 new_position)
 {
 
     qint64 duration = this->GetCurrentPlayer()->duration();
-    std::cout << new_position << "/" << duration << std::endl;
 
     if (duration >= 1000)
     {
