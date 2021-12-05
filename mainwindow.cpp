@@ -215,7 +215,7 @@ void MainWindow::OnPositionChanged(qint64 new_position)
 
         snprintf(
             label_text,
-            20,
+            sizeof(label_text),
             "%lld:%02lld:%02lld / %lld:%02lld:%02lld",
             new_pos_hrs,
             new_pos_mins % 60,
