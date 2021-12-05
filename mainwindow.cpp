@@ -201,7 +201,7 @@ void MainWindow::OnPositionChanged(qint64 new_position)
 
         duration = duration / 1000;
 
-        char label_text[20];
+        char label_text[59];
         long long dur_mins = std::floor(duration / 60);
         long long dur_hrs = std::floor(dur_mins / 60);
         long long new_pos_mins = 0;
