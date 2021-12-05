@@ -62,6 +62,7 @@ public slots:
     void ToggleAlwaysOnTop(bool new_value);
     // Slots for media events
     void OnMediaStateChange(QMediaPlayer::State newState);
+    void OnDurationChange(qint64 newDuration);
 
 private:
     Ui::MainWindow *ui;
@@ -110,8 +111,10 @@ private:
     bool IsPlayAvailable();
     bool IsPlaying();
     void SelectStation(int station_index);
-    void SetCurrentPlayerPosition();
     QString GetMediaName();
+
+    void SetPositionSetRequiredFlag();
+    bool set_position_callback_enabled;
 
     int LoadCurrentStation();
     void SaveCurrentStation();

@@ -26,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
     this->players[1] = new QMediaPlayer;
     this->currentPlayerItx = 0;
 
+    // Add callbacks to handle durationChanged to set position
+    QObject::connect(this->players[0], SIGNAL(durationChanged(qint64)), this, SLOT(OnDurationChange(qint64)));
+    QObject::connect(this->players[1], SIGNAL(durationChanged(qint64)), this, SLOT(OnDurationChange(qint64)));
+
     // Disable interupts
     this->mediaStateChangeInteruptEnabled = false;
 
@@ -39,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->UpdateDirectory(
         this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString(),
         this->LoadCurrentStation());
-    this->SetCurrentPlayerPosition();
+    this->SetPositionSetRequiredFlag();
     this->Play();
 
     this->change_directory_action = new QAction(0);
@@ -78,6 +82,27 @@ MainWindow::MainWindow(QWidget *parent)
     // Listen to media events
     QObject::connect(this->players[0], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
     QObject::connect(this->players[1], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
+}
+
+void MainWindow::OnDurationChange(qint64 newDuration) {
+    std::cout << "OnDurationChange called" << std::endl;
+    if (this->set_position_callback_enabled) {
+        // Re-disable callback
+        this->set_position_callback_enabled = false;
+
+        // Set position based on time since application startup, using modulus of track length.
+        // Ignore tts less than 0, maybe due to time change or race condition
+        qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
+        if (tts > 0)
+        {
+            qint64 dur = this->GetCurrentPlayer()->duration();
+            std::cout << "Track duration: " << this->GetCurrentPlayer()->duration() << std::endl;
+            if (dur > 0) {
+                std::cout << "Setting track to position: " << tts % this->GetCurrentPlayer()->duration() << std::endl;
+                this->GetCurrentPlayer()->setPosition(tts % this->GetCurrentPlayer()->duration());
+            }
+        }
+    }
 }
 
 void MainWindow::OnMediaStateChange(QMediaPlayer::State newState) {
@@ -147,7 +172,7 @@ void MainWindow::ResetGlobalTimer()
 
     // Pause current song
     this->GetCurrentPlayer()->pause();
-    this->SetCurrentPlayerPosition();
+    this->SetPositionSetRequiredFlag();
     this->GetCurrentPlayer()->play();
 }
 
@@ -336,7 +361,7 @@ void MainWindow::SelectStation(int station_index)
 
     if (was_playing)
     {
-        this->SetCurrentPlayerPosition();
+        this->SetPositionSetRequiredFlag();
         this->GetCurrentPlayer()->play();
     }
 
@@ -346,17 +371,9 @@ void MainWindow::SelectStation(int station_index)
     this->EnableMediaButtons();
 }
 
-void MainWindow::SetCurrentPlayerPosition()
+void MainWindow::SetPositionSetRequiredFlag()
 {
-    // Set position based on time since application startup, using modulus of track length.
-    // Ignore tts less than 0, maybe due to time change or race condition
-    qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
-    if (tts > 0)
-    {
-        qint64 dur = this->GetCurrentPlayer()->duration();
-        if (dur > 0)
-            this->GetCurrentPlayer()->setPosition(tts % this->GetCurrentPlayer()->duration());
-    }
+    this->set_position_callback_enabled = true;
 }
 
 QString MainWindow::GetMediaName()
