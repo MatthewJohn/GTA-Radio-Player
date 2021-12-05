@@ -42,25 +42,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="display">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>20</y>
-      <width>130</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="whatsThis">
-     <string>Station Name</string>
-    </property>
-    <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-    <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-   </widget>
    <widget class="QPushButton" name="muteButton">
     <property name="geometry">
      <rect>
@@ -98,6 +79,31 @@
     </property>
     <property name="text">
      <string>Prev</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="display">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>20</y>
+      <width>130</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="whatsThis">
+     <string>Station Name</string>
+    </property>
+    <property name="text">
+     <string>GTA Radio Player</string>
+    </property>
+    <property name="margin">
+     <number>0</number>
     </property>
    </widget>
    <widget class="QLabel" name="positionLabel">
