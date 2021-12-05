@@ -193,7 +193,6 @@ void MainWindow::FlipPlayer()
 
 void MainWindow::OnPositionChanged(qint64 new_position)
 {
-    std::cout << "ON Position changed callback called" << std::endl;
     qint64 duration = this->GetCurrentPlayer()->duration() / 1000;
     new_position = new_position / 1000;
     std::cout << new_position << "/" << duration << std::endl;
