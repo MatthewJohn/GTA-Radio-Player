@@ -183,6 +183,33 @@ QMediaPlayer* MainWindow::GetNextPlayer()
 void MainWindow::FlipPlayer()
 {
     this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
+
+    // Update slot for mediaChanged
+    if (this->position_change_connection != nullptr) {
+        disconnect(this->position_change_connection);
+    }
+    QObject::connect(this->GetCurrentPlayer(), SIGNAL(positionChanged(qint64)), this, SLOT(OnPositionChanged(qint64)));
+}
+
+void MainWindow::OnPositionChanged(qint64 new_position)
+{
+    std::cout << "ON Position changed callback called" << std::endl;
+    qint64 duration = this->GetCurrentPlayer()->duration() / 1000;
+    new_position = new_position / 1000;
+    std::cout << new_position << "/" << duration << std::endl;
+    if (new_position > 0 && duration > 0)
+    {
+        char label_text[20];
+        snprintf(
+            label_text,
+            20,
+            "%u:%02u / %u:%02u",
+            std::floor(new_position / 60),
+            new_position % 60,
+            std::floor(duration / 60),
+            duration % 60);
+        this->GetPositionLabel()->setText(label_text);
+    }
 }
 
 void MainWindow::MuteButtonSlot()
@@ -403,6 +430,11 @@ QPushButton* MainWindow::GetNextButton()
 QPushButton* MainWindow::GetPreviousButton()
 {
     return this->findChild<QPushButton *>("prevButton");
+}
+
+QLabel* MainWindow::GetPositionLabel()
+{
+    return this->findChild<QLabel *>("positionLabel");
 }
 
 void MainWindow::PopulateFileList()
