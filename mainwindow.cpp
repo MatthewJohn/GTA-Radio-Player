@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->reset_global_timer, SIGNAL(triggered(bool)), this, SLOT(ResetGlobalTimer()));
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
 
-    // Listen to media events
+    // Listen to media evente
     QObject::connect(this->players[0], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
     QObject::connect(this->players[1], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
 }
@@ -107,6 +107,8 @@ void MainWindow::OnDurationChange(qint64 newDuration) {
 
 void MainWindow::OnMediaStateChange(QMediaPlayer::State newState) {
     std::cout << "New State: " << newState << std::endl;
+    // If interupts are disabled (when swapping players), if some comes to an end,
+    // start the player again.
     if (this->mediaStateChangeInteruptEnabled && newState == QMediaPlayer::StoppedState) {
         std::cout << "Interupts enabled, restarting current player" << std::endl;
         this->GetCurrentPlayer()->play();
