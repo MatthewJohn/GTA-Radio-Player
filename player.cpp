@@ -13,7 +13,7 @@ void Player::Setup(MainWindow* main_window)
 {
     this->main_window = main_window;
 
-    QObject::connect(this->GetMediaPlayer(), SIGNAL(stateChanged(QMediaPlayer::State)), this->main_window, SLOT(OnMediaStateChange(QMediaPlayer::State)));
+    QObject::connect(this->GetMediaPlayer(), SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
 
     // Add callbacks to handle durationChanged to set position
     QObject::connect(this->GetMediaPlayer(), SIGNAL(durationChanged(qint64)), this, SLOT(OnDurationChange(qint64)));
