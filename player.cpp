@@ -3,22 +3,32 @@
 
 Player::Player()
 {
-    //this->main_window = main_window;
     this->player = new QMediaPlayer;
     this->is_active = false;
-
+    this->media_interupts_enabled = false;
+    this->position_set_required = false;
+    this->media_buffered = false;
+    this->media_loaded = false;
 }
 
-void Player::Setup(MainWindow* main_window)
+void Player::Setup(MainWindow* main_window, int player_index)
 {
     this->main_window = main_window;
+    this->player_index = player_index;
 
-    QObject::connect(this->GetMediaPlayer(), SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
-
-    // Add callbacks to handle durationChanged to set position
+    QObject::connect(this->GetMediaPlayer(), SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnStateChanged(QMediaPlayer::State)));
     QObject::connect(this->GetMediaPlayer(), SIGNAL(durationChanged(qint64)), this, SLOT(OnDurationChange(qint64)));
-
     QObject::connect(this->GetMediaPlayer(), SIGNAL(positionChanged(qint64)), this, SLOT(OnPositionChanged(qint64)));
+    QObject::connect(this->GetMediaPlayer(), SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(OnMediaStatusChange(QMediaPlayer::MediaStatus)));
+}
+
+void Player::OnMediaStatusChange(QMediaPlayer::MediaStatus status)
+{
+    std::cout << "Player " << this-> player_index << ": State: " << status << std::endl;
+    if (status == QMediaPlayer::LoadedMedia)
+        this->media_loaded = true;
+    else if (status == QMediaPlayer::BufferedMedia)
+        this->media_buffered = true;
 }
 
 QMediaPlayer* Player::GetMediaPlayer()
@@ -33,7 +43,6 @@ void Player::OnPositionChanged(qint64 new_position)
     if (! this->is_active)
         return;
 
-     std::cout << "PUTTING DATA";
     qint64 duration = this->GetMediaPlayer()->duration();
 
     if (duration >= 1000)
@@ -71,10 +80,10 @@ void Player::OnPositionChanged(qint64 new_position)
 
 
 void Player::OnDurationChange(qint64 new_duration) {
-    std::cout << "OnDurationChange called" << std::endl;
-    if (this->main_window->set_position_callback_enabled) {
+    std::cout << "Player " << this-> player_index << ": OnDurationChange called" << std::endl;
+    if (this->position_set_required) {
         // Re-disable callback
-        this->main_window->set_position_callback_enabled = false;
+        this->position_set_required = false;
 
         // Set position based on time since application startup, using modulus of track length.
         // Ignore tts less than 0, maybe due to time change or race condition
@@ -91,14 +100,68 @@ void Player::OnDurationChange(qint64 new_duration) {
     }
 }
 
-void Player::OnMediaStateChange(QMediaPlayer::State newState) {
-    std::cout << "New State: " << newState << std::endl;
+void Player::OnStateChanged(QMediaPlayer::State newState) {
+    std::cout << "Player " << this-> player_index << ": Media State: " << newState << std::endl;
     // If interupts are disabled (when swapping players), if some comes to an end,
     // start the player again.
-    if (this->main_window->MediaStateChangeInteruptEnabled && newState == QMediaPlayer::StoppedState) {
+    if (this->media_interupts_enabled && newState == QMediaPlayer::StoppedState) {
         std::cout << "Interupts enabled, restarting current player" << std::endl;
         this->GetMediaPlayer()->play();
     }
+}
+
+void Player::PrepareFlipTo(QUrl url)
+{
+    // Update file path of next player
+    this->media_loaded = false;
+    this->GetMediaPlayer()->setMedia(url);
+
+    while (this->media_loaded == false)
+        // Wait for 50ms
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+
+    this->media_buffered = false;
+    this->GetMediaPlayer()->pause();
+
+    // Wait for media to buffer
+    while (this->media_buffered == false)
+        // Wait for 50ms
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+}
+
+void Player::FlipFrom(bool was_playing)
+{
+    this->media_interupts_enabled = false;
+    if (was_playing)
+        this->player->pause();
+}
+
+void Player::FlipTo(bool was_playing)
+{
+    this->is_active = true;
+    if (was_playing)
+        this->Play();
+
+    this->media_interupts_enabled = true;
+}
+
+void Player::SetPositionSetRequiredFlag()
+{
+    this->position_set_required = true;
+}
+
+void Player::Play()
+{
+    this->SetPositionSetRequiredFlag();
+
+    this->GetMediaPlayer()->play();
+    if (this->GetMediaPlayer()->error())
+        this->main_window->DisplayError(this->GetMediaPlayer()->errorString());
+    else if (this->GetMediaPlayer()->state() != QMediaPlayer::PlayingState)
+        this->main_window->DisplayError("Not playing");
+
+    // Enable interupts, as no longer expecting media changes.
+    this->media_interupts_enabled = true;
 }
 
 Player::~Player()

@@ -23,14 +23,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Create player objects and set current
     // player index to first player
     this->players[0] = new Player;
-    this->players[0]->Setup(this);
+    this->players[0]->Setup(this, 1);
     this->players[1] = new Player;
-    this->players[1]->Setup(this);
+    this->players[1]->Setup(this, 2);
     this->currentPlayerItx = 0;
-    this->GetCurrentPlayer()->is_active = true;
-
-    // Disable interupts
-    this->MediaStateChangeInteruptEnabled = false;
 
     this->GetVolumeDial()->setValue(this->settings->value(SETTINGS_KEY_VOLUME, INITIAL_VOLUME).toInt());
     this->VolumeDialChangeSlot();
@@ -175,13 +171,6 @@ Player* MainWindow::GetNextPlayer()
     return this->players[this->currentPlayerItx ? 0 : 1];
 }
 
-void MainWindow::FlipPlayer()
-{
-    this->GetCurrentPlayer()->is_active = false;
-    this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
-    this->GetCurrentPlayer()->is_active = true;
-}
-
 
 void MainWindow::MuteButtonSlot()
 {
@@ -234,27 +223,8 @@ void MainWindow::Play()
     if (! this->IsPlayAvailable())
         return;
 
-
-    this->GetCurrentPlayer()->GetMediaPlayer()->play();
-
-    this->SetPositionSetRequiredFlag();
-
-    if (this->GetCurrentPlayer()->GetMediaPlayer()->error())
-        this->DisplayError(this->GetCurrentPlayer()->GetMediaPlayer()->errorString());
-    else if (this->GetCurrentPlayer()->GetMediaPlayer()->state() != QMediaPlayer::PlayingState)
-        this->DisplayError("Not playing");
-
-    // Enable interupts, as no longer expecting media changes.
-    this->EnableMediaInterupts();
+    this->GetCurrentPlayer()->Play();
 }
-
-void MainWindow::DisableMediaInterupts() {
-    this->MediaStateChangeInteruptEnabled = false;
-}
-void MainWindow::EnableMediaInterupts() {
-    this->MediaStateChangeInteruptEnabled = true;
-}
-
 
 void MainWindow::SetMute(bool muted)
 {
@@ -320,42 +290,30 @@ void MainWindow::SelectStation(int station_index)
     this->currentStation = station_index;
     this->SaveCurrentStation();
 
-    // Update file path of next player
-    this->GetNextPlayer()->GetMediaPlayer()->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
+    this->GetNextPlayer()->PrepareFlipTo(QUrl::fromLocalFile(this->stationFiles[station_index]));
 
     // Wait for player to load media
     while (this->GetNextPlayer()->GetMediaPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
         QCoreApplication::processEvents(QEventLoop::AllEvents, MEDIA_LOAD_WAIT_PERIOD);
 
-    this->DisableMediaInterupts();
-
     // Pause old player, start new one and flip
     bool was_playing = this->IsPlaying();
-    if (was_playing)
-    {
-        this->GetCurrentPlayer()->GetMediaPlayer()->pause();
-        this->SetDisplay("Re-tuning...");
+    this->GetCurrentPlayer()->FlipFrom(was_playing);
 
-        // Pause for dramatic effect!
-        qint64 start_pause = QDateTime::currentMSecsSinceEpoch();
-        while (QDateTime::currentMSecsSinceEpoch() < (start_pause + STATION_CHANGE_DRAMATIC_PAUSE_DURATION))
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-    }
+    this->SetDisplay("Re-tuning...");
 
-    this->FlipPlayer();
+    // Pause for dramatic effect!
+    qint64 start_pause = QDateTime::currentMSecsSinceEpoch();
+    while (QDateTime::currentMSecsSinceEpoch() < (start_pause + STATION_CHANGE_DRAMATIC_PAUSE_DURATION))
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 
-    if (was_playing)
-        this->Play();
+    this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
 
-    this->EnableMediaInterupts();
+    // Flip to new player (note now GetCurrentPlayer since currentPlayerItx has now been updated).
+    this->GetCurrentPlayer()->FlipTo(was_playing);
 
     this->SetDisplay(this->GetMediaName());
     this->EnableMediaButtons();
-}
-
-void MainWindow::SetPositionSetRequiredFlag()
-{
-    this->set_position_callback_enabled = true;
 }
 
 QString MainWindow::GetMediaName()

@@ -55,9 +55,7 @@ public:
 
     QLabel* GetPositionLabel();
     qint64 GetStartupTime();
-    bool MediaStateChangeInteruptEnabled;
-    bool set_position_callback_enabled;
-
+    void DisplayError(QString err);
 
 public slots:
     // Slots for controls
@@ -95,7 +93,6 @@ private:
     int currentPlayerItx;
     Player* GetCurrentPlayer();
     Player* GetNextPlayer();
-    void FlipPlayer();
 
     // List of stations
     QString stationFiles[MAX_STATIONS];
@@ -121,8 +118,6 @@ private:
     void SelectStation(int station_index);
     QString GetMediaName();
 
-    void SetPositionSetRequiredFlag();
-
     int LoadCurrentStation();
     void SaveCurrentStation();
 
@@ -132,7 +127,6 @@ private:
     void DisableMediaInterupts();
     void EnableMediaInterupts();
 
-    void SetDisplay(QString text);
 
     QDial* GetVolumeDial();
     QPushButton* GetMuteButton();
@@ -140,7 +134,7 @@ private:
     QPushButton* GetPreviousButton();
     QLabel* GetDisplay();
 
-    void DisplayError(QString err);
+    void SetDisplay(QString text);
     void DisplayInfo(QString info);
 
 };

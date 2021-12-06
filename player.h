@@ -7,6 +7,7 @@
 #include <QMediaPlayer>
 #include <QMediaMetaData>
 #include <QLabel>
+#include <QCoreApplication>
 
 class MainWindow;
 
@@ -18,21 +19,32 @@ public:
     Player();
     ~Player();
 
-    void Setup(MainWindow* main_window);
+    void Setup(MainWindow* main_window, int player_index);
     QMediaPlayer* GetMediaPlayer();
 
-    bool is_active;
-
+    void PrepareFlipTo(QUrl url);
+    void FlipFrom(bool was_playing);
+    void FlipTo(bool was_playing);
+    void Play();
 
 public slots:
     // Slots for media events
-    void OnMediaStateChange(QMediaPlayer::State new_state);
+    void OnMediaStatusChange(QMediaPlayer::MediaStatus status);
     void OnDurationChange(qint64 new_duration);
     void OnPositionChanged(qint64 new_position);
+    void OnStateChanged(QMediaPlayer::State state);
 
 private:
     MainWindow* main_window;
     QMediaPlayer* player;
+    int player_index;
+    bool is_active;
+    bool media_interupts_enabled;
+    bool media_loaded;
+    bool media_buffered;
+    bool position_set_required;
+    void SetPositionSetRequiredFlag();
+
 };
 
 #endif // PLAYER_H
