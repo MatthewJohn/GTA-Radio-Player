@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
+    <width>512</width>
     <height>82</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>392</width>
+    <width>512</width>
     <height>82</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>392</width>
+    <width>512</width>
     <height>82</height>
    </size>
   </property>
@@ -35,30 +35,11 @@
    <widget class="QDial" name="volumeDial">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>460</x>
       <y>0</y>
       <width>50</width>
       <height>64</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QTextBrowser" name="display">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>20</y>
-      <width>130</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="whatsThis">
-     <string>Station Name</string>
-    </property>
-    <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
-    </property>
-    <property name="horizontalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
    </widget>
    <widget class="QPushButton" name="muteButton">
@@ -98,6 +79,44 @@
     </property>
     <property name="text">
      <string>Prev</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="display">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>20</y>
+      <width>130</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="whatsThis">
+     <string>Station Name</string>
+    </property>
+    <property name="text">
+     <string>GTA Radio Player</string>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="positionLabel">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>20</y>
+      <width>120</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0:00:00 / 0:00:00</string>
     </property>
    </widget>
   </widget>

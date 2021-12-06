@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <iostream>
+#include <cmath>
 #include <QMainWindow>
 #include <QDirIterator>
 #include <QDebug>
@@ -63,6 +64,7 @@ public slots:
     // Slots for media events
     void OnMediaStateChange(QMediaPlayer::State newState);
     void OnDurationChange(qint64 newDuration);
+    void OnPositionChanged(qint64 new_position);
 
 private:
     Ui::MainWindow *ui;
@@ -89,6 +91,7 @@ private:
     QMediaPlayer* GetCurrentPlayer();
     QMediaPlayer* GetNextPlayer();
     void FlipPlayer();
+    QMetaObject::Connection position_change_connection;
 
     // List of stations
     QString stationFiles[MAX_STATIONS];
@@ -132,6 +135,8 @@ private:
     QPushButton* GetMuteButton();
     QPushButton* GetNextButton();
     QPushButton* GetPreviousButton();
+    QLabel* GetPositionLabel();
+    QLabel* GetDisplay();
 
     void DisplayError(QString err);
     void DisplayInfo(QString info);

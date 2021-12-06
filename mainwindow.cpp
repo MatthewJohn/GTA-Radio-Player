@@ -46,6 +46,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->SetPositionSetRequiredFlag();
     this->Play();
 
+    // Set background colour of display label
+    this->GetDisplay()->setStyleSheet("QLabel { background-color: white; margin: 1px; }");
+
     this->change_directory_action = new QAction(0);
     this->change_directory_action->setText("Change Directory");
 
@@ -210,6 +213,50 @@ QMediaPlayer* MainWindow::GetNextPlayer()
 void MainWindow::FlipPlayer()
 {
     this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
+
+    // Update slot for mediaChanged
+    if (this->position_change_connection != nullptr) {
+        disconnect(this->position_change_connection);
+    }
+    QObject::connect(this->GetCurrentPlayer(), SIGNAL(positionChanged(qint64)), this, SLOT(OnPositionChanged(qint64)));
+}
+
+void MainWindow::OnPositionChanged(qint64 new_position)
+{
+
+    qint64 duration = this->GetCurrentPlayer()->duration();
+
+    if (duration >= 1000)
+    {
+
+        duration = duration / 1000;
+
+        char label_text[59];
+        long long dur_mins = std::floor(duration / 60);
+        long long dur_hrs = std::floor(dur_mins / 60);
+        long long new_pos_mins = 0;
+        long long new_pos_hrs = 0;
+
+        if (new_position >= 1000) {
+            new_position = new_position / 1000;
+            new_pos_mins = std::floor(new_position / 60);
+            new_pos_hrs = std::floor(new_pos_mins / 60);
+        }
+
+        snprintf(
+            label_text,
+            sizeof(label_text),
+            "%lld:%02lld:%02lld / %lld:%02lld:%02lld",
+            new_pos_hrs,
+            new_pos_mins % 60,
+            new_position % 60,
+            dur_hrs,
+            dur_mins % 60,
+            duration % 60);
+        this->GetPositionLabel()->setText(label_text);
+    } else {
+        this->GetPositionLabel()->setText("0:00:00 / 0:00:00");
+    }
 }
 
 void MainWindow::MuteButtonSlot()
@@ -381,14 +428,30 @@ void MainWindow::SetPositionSetRequiredFlag()
 QString MainWindow::GetMediaName()
 {
     QString name = this->GetCurrentPlayer()->metaData(QMediaMetaData::Title).toString();
-    if (name.isEmpty())
+    if (name.isEmpty()) {
         name = this->GetCurrentPlayer()->currentMedia().canonicalUrl().fileName();
+
+        // Check if name contains a dot and attempt to remove
+        if (name.indexOf('.') != -1) {
+            for (int itx = name.length() - 1; itx > 1;  itx -- ) {
+                bool extension_removed = name[itx] == '.';
+                name.truncate(itx);
+                if (extension_removed)
+                    break;
+            }
+        }
+    }
+
     return name;
+}
+
+QLabel* MainWindow::GetDisplay() {
+    return this->findChild<QLabel *>("display");
 }
 
 void MainWindow::SetDisplay(QString text)
 {
-    this->findChild<QTextBrowser *>("display")->setText(text);
+    this->GetDisplay()->setText(text);
 }
 
 QDial* MainWindow::GetVolumeDial()
@@ -422,6 +485,11 @@ QPushButton* MainWindow::GetNextButton()
 QPushButton* MainWindow::GetPreviousButton()
 {
     return this->findChild<QPushButton *>("prevButton");
+}
+
+QLabel* MainWindow::GetPositionLabel()
+{
+    return this->findChild<QLabel *>("positionLabel");
 }
 
 void MainWindow::PopulateFileList()
