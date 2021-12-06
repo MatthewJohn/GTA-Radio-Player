@@ -43,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->UpdateDirectory(
         this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString(),
         this->LoadCurrentStation());
-    this->SetPositionSetRequiredFlag();
     this->Play();
 
     // Set background colour of display label
@@ -177,8 +176,7 @@ void MainWindow::ResetGlobalTimer()
 
     // Pause current song
     this->GetCurrentPlayer()->pause();
-    this->SetPositionSetRequiredFlag();
-    this->GetCurrentPlayer()->play();
+    this->Play();
 }
 
 void MainWindow::SetStartupTime(bool force_reset)
@@ -310,6 +308,8 @@ void MainWindow::Play()
     if (! this->IsPlayAvailable())
         return;
 
+    this->SetPositionSetRequiredFlag();
+
     this->GetCurrentPlayer()->play();
     if (this->GetCurrentPlayer()->error())
         this->DisplayError(this->GetCurrentPlayer()->errorString());
@@ -409,10 +409,7 @@ void MainWindow::SelectStation(int station_index)
     this->FlipPlayer();
 
     if (was_playing)
-    {
-        this->SetPositionSetRequiredFlag();
-        this->GetCurrentPlayer()->play();
-    }
+        this->Play();
 
     this->EnableMediaInterupts();
 
