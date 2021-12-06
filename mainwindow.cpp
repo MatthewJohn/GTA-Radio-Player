@@ -22,16 +22,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Create player objects and set current
     // player index to first player
-    this->players[0] = new QMediaPlayer;
-    this->players[1] = new QMediaPlayer;
+    this->players[0] = new Player;
+    this->players[0]->Setup(this);
+    this->players[1] = new Player;
+    this->players[1]->Setup(this);
     this->currentPlayerItx = 0;
-
-    // Add callbacks to handle durationChanged to set position
-    QObject::connect(this->players[0], SIGNAL(durationChanged(qint64)), this, SLOT(OnDurationChange(qint64)));
-    QObject::connect(this->players[1], SIGNAL(durationChanged(qint64)), this, SLOT(OnDurationChange(qint64)));
+    this->GetCurrentPlayer()->is_active = true;
 
     // Disable interupts
-    this->mediaStateChangeInteruptEnabled = false;
+    this->MediaStateChangeInteruptEnabled = false;
 
     this->GetVolumeDial()->setValue(this->settings->value(SETTINGS_KEY_VOLUME, INITIAL_VOLUME).toInt());
     this->VolumeDialChangeSlot();
@@ -80,49 +79,13 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
     QObject::connect(this->reset_global_timer, SIGNAL(triggered(bool)), this, SLOT(ResetGlobalTimer()));
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
-
-    // Listen to media evente
-    QObject::connect(this->players[0], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
-    QObject::connect(this->players[1], SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(OnMediaStateChange(QMediaPlayer::State)));
 }
 
-void MainWindow::OnDurationChange(qint64 newDuration) {
-    std::cout << "OnDurationChange called" << std::endl;
-    if (this->set_position_callback_enabled) {
-        // Re-disable callback
-        this->set_position_callback_enabled = false;
-
-        // Set position based on time since application startup, using modulus of track length.
-        // Ignore tts less than 0, maybe due to time change or race condition
-        qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->startupTime);
-        if (tts > 0)
-        {
-            qint64 dur = this->GetCurrentPlayer()->duration();
-            std::cout << "Track duration: " << this->GetCurrentPlayer()->duration() << std::endl;
-            if (dur > 0) {
-                std::cout << "Setting track to position: " << tts % this->GetCurrentPlayer()->duration() << std::endl;
-                this->GetCurrentPlayer()->setPosition(tts % this->GetCurrentPlayer()->duration());
-            }
-        }
-    }
+qint64 MainWindow::GetStartupTime()
+{
+    return this->startupTime;
 }
 
-void MainWindow::OnMediaStateChange(QMediaPlayer::State newState) {
-    std::cout << "New State: " << newState << std::endl;
-    // If interupts are disabled (when swapping players), if some comes to an end,
-    // start the player again.
-    if (this->mediaStateChangeInteruptEnabled && newState == QMediaPlayer::StoppedState) {
-        std::cout << "Interupts enabled, restarting current player" << std::endl;
-        this->GetCurrentPlayer()->play();
-    }
-}
-
-void MainWindow::DisableMediaInterupts() {
-    this->mediaStateChangeInteruptEnabled = false;
-}
-void MainWindow::EnableMediaInterupts() {
-    this->mediaStateChangeInteruptEnabled = true;
-}
 
 void MainWindow::UpdateDirectory(QString new_directory, int station_index)
 {
@@ -146,9 +109,13 @@ void MainWindow::UpdateDirectory(QString new_directory, int station_index)
 void MainWindow::DisablePlayer()
 {
     this->SetDisplay("No tracks found...");
-    this->GetCurrentPlayer()->pause();
-    this->GetNextPlayer()->pause();
+    this->Pause();
     this->DisableMediaButtons();
+}
+
+void MainWindow::Pause()
+{
+    this->GetCurrentPlayer()->GetMediaPlayer()->pause();
 }
 
 void MainWindow::OpenChangeDirectory()
@@ -175,7 +142,7 @@ void MainWindow::ResetGlobalTimer()
         return;
 
     // Pause current song
-    this->GetCurrentPlayer()->pause();
+    this->GetCurrentPlayer()->GetMediaPlayer()->pause();
     this->Play();
 }
 
@@ -199,18 +166,20 @@ void MainWindow::ToggleAlwaysOnTop(bool new_value)
     this->DisplayInfo("Application must be restarted for changes to take effect.");
 }
 
-QMediaPlayer* MainWindow::GetCurrentPlayer()
+Player* MainWindow::GetCurrentPlayer()
 {
     return this->players[this->currentPlayerItx];
 }
-QMediaPlayer* MainWindow::GetNextPlayer()
+Player* MainWindow::GetNextPlayer()
 {
     return this->players[this->currentPlayerItx ? 0 : 1];
 }
 
 void MainWindow::FlipPlayer()
 {
+    this->GetCurrentPlayer()->is_active = false;
     this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
+    this->GetCurrentPlayer()->is_active = true;
 
     // Update slot for mediaChanged
     if (this->position_change_connection != nullptr) {
@@ -219,47 +188,10 @@ void MainWindow::FlipPlayer()
     QObject::connect(this->GetCurrentPlayer(), SIGNAL(positionChanged(qint64)), this, SLOT(OnPositionChanged(qint64)));
 }
 
-void MainWindow::OnPositionChanged(qint64 new_position)
-{
-
-    qint64 duration = this->GetCurrentPlayer()->duration();
-
-    if (duration >= 1000)
-    {
-
-        duration = duration / 1000;
-
-        char label_text[59];
-        long long dur_mins = std::floor(duration / 60);
-        long long dur_hrs = std::floor(dur_mins / 60);
-        long long new_pos_mins = 0;
-        long long new_pos_hrs = 0;
-
-        if (new_position >= 1000) {
-            new_position = new_position / 1000;
-            new_pos_mins = std::floor(new_position / 60);
-            new_pos_hrs = std::floor(new_pos_mins / 60);
-        }
-
-        snprintf(
-            label_text,
-            sizeof(label_text),
-            "%lld:%02lld:%02lld / %lld:%02lld:%02lld",
-            new_pos_hrs,
-            new_pos_mins % 60,
-            new_position % 60,
-            dur_hrs,
-            dur_mins % 60,
-            duration % 60);
-        this->GetPositionLabel()->setText(label_text);
-    } else {
-        this->GetPositionLabel()->setText("0:00:00 / 0:00:00");
-    }
-}
 
 void MainWindow::MuteButtonSlot()
 {
-    if (this->GetCurrentPlayer()->isMuted())
+    if (this->GetCurrentPlayer()->GetMediaPlayer()->isMuted())
     {
         this->SetMute(false);
         this->GetMuteButton()->setText(MUTE_BUTTON_TEXT_MUTE);
@@ -279,7 +211,7 @@ bool MainWindow::IsPlaying()
     if (! this->IsPlayAvailable())
         return false;
 
-    return (this->GetCurrentPlayer()->state() == QMediaPlayer::PlayingState);
+    return (this->GetCurrentPlayer()->GetMediaPlayer()->state() == QMediaPlayer::PlayingState);
 }
 
 void MainWindow::DisableMediaButtons()
@@ -308,22 +240,32 @@ void MainWindow::Play()
     if (! this->IsPlayAvailable())
         return;
 
+
+    this->GetCurrentPlayer()->GetMediaPlayer()->play();
+
     this->SetPositionSetRequiredFlag();
 
-    this->GetCurrentPlayer()->play();
-    if (this->GetCurrentPlayer()->error())
-        this->DisplayError(this->GetCurrentPlayer()->errorString());
-    else if (this->GetCurrentPlayer()->state() != QMediaPlayer::PlayingState)
+    if (this->GetCurrentPlayer()->GetMediaPlayer()->error())
+        this->DisplayError(this->GetCurrentPlayer()->GetMediaPlayer()->errorString());
+    else if (this->GetCurrentPlayer()->GetMediaPlayer()->state() != QMediaPlayer::PlayingState)
         this->DisplayError("Not playing");
 
     // Enable interupts, as no longer expecting media changes.
     this->EnableMediaInterupts();
 }
 
+void MainWindow::DisableMediaInterupts() {
+    this->MediaStateChangeInteruptEnabled = false;
+}
+void MainWindow::EnableMediaInterupts() {
+    this->MediaStateChangeInteruptEnabled = true;
+}
+
+
 void MainWindow::SetMute(bool muted)
 {
-    this->GetCurrentPlayer()->setMuted(muted);
-    this->GetNextPlayer()->setMuted(muted);
+    this->GetCurrentPlayer()->GetMediaPlayer()->setMuted(muted);
+    this->GetNextPlayer()->GetMediaPlayer()->setMuted(muted);
 }
 
 void MainWindow::NextStation()
@@ -385,10 +327,10 @@ void MainWindow::SelectStation(int station_index)
     this->SaveCurrentStation();
 
     // Update file path of next player
-    this->GetNextPlayer()->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
+    this->GetNextPlayer()->GetMediaPlayer()->setMedia(QUrl::fromLocalFile(this->stationFiles[station_index]));
 
     // Wait for player to load media
-    while (this->GetNextPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
+    while (this->GetNextPlayer()->GetMediaPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
         QCoreApplication::processEvents(QEventLoop::AllEvents, MEDIA_LOAD_WAIT_PERIOD);
 
     this->DisableMediaInterupts();
@@ -397,7 +339,7 @@ void MainWindow::SelectStation(int station_index)
     bool was_playing = this->IsPlaying();
     if (was_playing)
     {
-        this->GetCurrentPlayer()->pause();
+        this->GetCurrentPlayer()->GetMediaPlayer()->pause();
         this->SetDisplay("Re-tuning...");
 
         // Pause for dramatic effect!
@@ -424,9 +366,9 @@ void MainWindow::SetPositionSetRequiredFlag()
 
 QString MainWindow::GetMediaName()
 {
-    QString name = this->GetCurrentPlayer()->metaData(QMediaMetaData::Title).toString();
+    QString name = this->GetCurrentPlayer()->GetMediaPlayer()->metaData(QMediaMetaData::Title).toString();
     if (name.isEmpty()) {
-        name = this->GetCurrentPlayer()->currentMedia().canonicalUrl().fileName();
+        name = this->GetCurrentPlayer()->GetMediaPlayer()->currentMedia().canonicalUrl().fileName();
 
         // Check if name contains a dot and attempt to remove
         if (name.indexOf('.') != -1) {
@@ -464,8 +406,8 @@ void MainWindow::VolumeDialChangeSlot()
     this->settings->setValue(SETTINGS_KEY_VOLUME, QVariant(new_volume));
 
     // Set volume of both players
-    this->GetCurrentPlayer()->setVolume(new_volume);
-    this->GetNextPlayer()->setVolume(new_volume);
+    this->GetCurrentPlayer()->GetMediaPlayer()->setVolume(new_volume);
+    this->GetNextPlayer()->GetMediaPlayer()->setVolume(new_volume);
 }
 
 QPushButton* MainWindow::GetMuteButton()
