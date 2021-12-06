@@ -20,6 +20,7 @@ void Player::Setup(MainWindow* main_window, int player_index)
     QObject::connect(this->GetMediaPlayer(), SIGNAL(durationChanged(qint64)), this, SLOT(OnDurationChange(qint64)));
     QObject::connect(this->GetMediaPlayer(), SIGNAL(positionChanged(qint64)), this, SLOT(OnPositionChanged(qint64)));
     QObject::connect(this->GetMediaPlayer(), SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(OnMediaStatusChange(QMediaPlayer::MediaStatus)));
+    this->PrintDebug("Setup connectors");
 }
 
 void Player::OnMediaStatusChange(QMediaPlayer::MediaStatus status)
@@ -84,19 +85,6 @@ void Player::OnDurationChange(qint64 new_duration) {
     if (this->position_set_required) {
         // Re-disable callback
         this->position_set_required = false;
-
-        // Set position based on time since application startup, using modulus of track length.
-        // Ignore tts less than 0, maybe due to time change or race condition
-        qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->main_window->GetStartupTime());
-        if (tts > 0)
-        {
-            qint64 dur = this->GetMediaPlayer()->duration();
-            std::cout << "Track duration: " << this->GetMediaPlayer()->duration() << std::endl;
-            if (dur > 0) {
-                std::cout << "Setting track to position: " << tts % this->GetMediaPlayer()->duration() << std::endl;
-                this->GetMediaPlayer()->setPosition(tts % this->GetMediaPlayer()->duration());
-            }
-        }
     }
 }
 
@@ -114,19 +102,49 @@ void Player::PrepareFlipTo(QUrl url)
 {
     // Update file path of next player
     this->media_loaded = false;
+    this->PrintDebug("Loading file: " + url.url());
     this->GetMediaPlayer()->setMedia(url);
 
+    this->PrintDebug("Waiting for media to load.");
     while (this->media_loaded == false)
         // Wait for 50ms
         QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+    this->PrintDebug("Media loaded.");
 
     this->media_buffered = false;
     this->GetMediaPlayer()->pause();
 
     // Wait for media to buffer
+    this->PrintDebug("Waiting for media to buffer.");
     while (this->media_buffered == false)
         // Wait for 50ms
         QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+    this->PrintDebug("Media buffered.");
+
+    // Play track
+    bool was_muted = this->GetMediaPlayer()->isMuted();
+    bool was_active = this->is_active;
+
+    this->SetPositionSetRequiredFlag();
+
+    this->is_active = false;
+    this->GetMediaPlayer()->setMuted(true);
+    this->GetMediaPlayer()->play();
+
+    // Wait for position to be set (and required flag set to false
+    std::cout << "Player " << this->player_index << ": Waiting to position to be set" << std::endl;
+    while (this->position_set_required)
+        // Wait for 50ms
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+
+    this->GetMediaPlayer()->pause();
+    this->GetMediaPlayer()->setMuted(was_muted);
+    this->is_active = was_active;
+}
+
+void Player::PrintDebug(QString debug)
+{
+    std::cout << "Player " << this->player_index << ": " << debug.toStdString() << std::endl;
 }
 
 void Player::FlipFrom(bool was_playing)
@@ -138,11 +156,30 @@ void Player::FlipFrom(bool was_playing)
 
 void Player::FlipTo(bool was_playing)
 {
+    this->SetPosition();
+
     this->is_active = true;
     if (was_playing)
         this->Play();
 
     this->media_interupts_enabled = true;
+}
+
+void Player::SetPosition()
+{
+
+    // Set position based on time since application startup, using modulus of track length.
+    // Ignore tts less than 0, maybe due to time change or race condition
+    qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->main_window->GetStartupTime());
+    if (tts > 0)
+    {
+        qint64 dur = this->GetMediaPlayer()->duration();
+        std::cout << "Track duration: " << this->GetMediaPlayer()->duration() << std::endl;
+        if (dur > 0) {
+            std::cout << "Setting track to position: " << tts % this->GetMediaPlayer()->duration() << std::endl;
+            this->GetMediaPlayer()->setPosition(tts % this->GetMediaPlayer()->duration());
+        }
+    }
 }
 
 void Player::SetPositionSetRequiredFlag()
@@ -152,7 +189,7 @@ void Player::SetPositionSetRequiredFlag()
 
 void Player::Play()
 {
-    this->SetPositionSetRequiredFlag();
+    this->SetPosition();
 
     this->GetMediaPlayer()->play();
     if (this->GetMediaPlayer()->error())

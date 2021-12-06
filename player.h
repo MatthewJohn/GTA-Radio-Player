@@ -44,6 +44,8 @@ private:
     bool media_buffered;
     bool position_set_required;
     void SetPositionSetRequiredFlag();
+    void SetPosition();
+    void PrintDebug(QString debug);
 
 };
 
