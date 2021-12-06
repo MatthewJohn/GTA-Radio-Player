@@ -129,7 +129,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Pause</string>
+     <string>Play</string>
     </property>
    </widget>
   </widget>
