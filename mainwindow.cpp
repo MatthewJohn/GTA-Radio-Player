@@ -180,12 +180,6 @@ void MainWindow::FlipPlayer()
     this->GetCurrentPlayer()->is_active = false;
     this->currentPlayerItx = this->currentPlayerItx ? 0 : 1;
     this->GetCurrentPlayer()->is_active = true;
-
-    // Update slot for mediaChanged
-    if (this->position_change_connection != nullptr) {
-        disconnect(this->position_change_connection);
-    }
-    QObject::connect(this->GetCurrentPlayer(), SIGNAL(positionChanged(qint64)), this, SLOT(OnPositionChanged(qint64)));
 }
 
 

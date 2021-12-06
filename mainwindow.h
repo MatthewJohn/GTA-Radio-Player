@@ -96,7 +96,6 @@ private:
     Player* GetCurrentPlayer();
     Player* GetNextPlayer();
     void FlipPlayer();
-    QMetaObject::Connection position_change_connection;
 
     // List of stations
     QString stationFiles[MAX_STATIONS];
