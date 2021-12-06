@@ -18,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent)
     if (always_on_top_set)
         setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
-    this->playing = false;
 
     // Create player objects and set current
     // player index to first player
@@ -33,12 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set startup time
     this->SetStartupTime(false);
-
-    // Select initial station
-    this->UpdateDirectory(
-        this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString(),
-        this->LoadCurrentStation());
-    this->Play();
 
     // Set background colour of display label
     this->GetDisplay()->setStyleSheet("QLabel { background-color: white; margin: 1px; }");
@@ -75,6 +68,20 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
     QObject::connect(this->reset_global_timer, SIGNAL(triggered(bool)), this, SLOT(ResetGlobalTimer()));
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
+
+    // Schedule function call which takes places immediately during execution of application
+    QTimer::singleShot(0, this, SLOT(PostStartup()));
+}
+
+void MainWindow::PostStartup()
+{
+    // Select initial station.
+    // This must be done after initial startup as MediaPlayer objects do not full function till
+    // application is running (e.g. get duration of song).
+    this->UpdateDirectory(
+        this->settings->value(SETTINGS_KEY_DIRECTORY, INITIAL_DIRECTORY).toString(),
+        this->LoadCurrentStation());
+    this->Play();
 }
 
 qint64 MainWindow::GetStartupTime()
@@ -291,10 +298,6 @@ void MainWindow::SelectStation(int station_index)
     this->SaveCurrentStation();
 
     this->GetNextPlayer()->PrepareFlipTo(QUrl::fromLocalFile(this->stationFiles[station_index]));
-
-    // Wait for player to load media
-    while (this->GetNextPlayer()->GetMediaPlayer()->mediaStatus() == QMediaPlayer::LoadingMedia)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, MEDIA_LOAD_WAIT_PERIOD);
 
     // Pause old player, start new one and flip
     bool was_playing = this->IsPlaying();

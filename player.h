@@ -43,7 +43,7 @@ private:
     bool media_loaded;
     bool media_buffered;
     bool position_set_required;
-    void SetPositionSetRequiredFlag();
+    qint64 track_duration;
     void SetPosition();
     void PrintDebug(QString debug);
 

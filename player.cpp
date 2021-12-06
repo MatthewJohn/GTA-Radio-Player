@@ -9,6 +9,7 @@ Player::Player()
     this->position_set_required = false;
     this->media_buffered = false;
     this->media_loaded = false;
+    this->track_duration = 0;
 }
 
 void Player::Setup(MainWindow* main_window, int player_index)
@@ -81,7 +82,8 @@ void Player::OnPositionChanged(qint64 new_position)
 
 
 void Player::OnDurationChange(qint64 new_duration) {
-    std::cout << "Player " << this-> player_index << ": OnDurationChange called" << std::endl;
+    std::cout << "Player " << this-> player_index << ": OnDurationChange called: " << new_duration << std::endl;
+    this->track_duration = new_duration;
     if (this->position_set_required) {
         // Re-disable callback
         this->position_set_required = false;
@@ -100,45 +102,46 @@ void Player::OnStateChanged(QMediaPlayer::State newState) {
 
 void Player::PrepareFlipTo(QUrl url)
 {
-    // Update file path of next player
+    this->position_set_required = true;
+
     this->media_loaded = false;
+    this->media_buffered = false;
+    this->track_duration = 0;
+
+    int old_volume = this->GetMediaPlayer()->volume();
+    bool was_active = this->is_active;
+
+    // Update file path of next player
     this->PrintDebug("Loading file: " + url.url());
     this->GetMediaPlayer()->setMedia(url);
 
     this->PrintDebug("Waiting for media to load.");
     while (this->media_loaded == false)
         // Wait for 50ms
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
     this->PrintDebug("Media loaded.");
 
-    this->media_buffered = false;
-    this->GetMediaPlayer()->pause();
+    // Play track
+    this->is_active = true;
+    this->GetMediaPlayer()->setVolume(0);
+    this->GetMediaPlayer()->play();
 
     // Wait for media to buffer
     this->PrintDebug("Waiting for media to buffer.");
     while (this->media_buffered == false)
         // Wait for 50ms
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
     this->PrintDebug("Media buffered.");
 
-    // Play track
-    bool was_muted = this->GetMediaPlayer()->isMuted();
-    bool was_active = this->is_active;
-
-    this->SetPositionSetRequiredFlag();
-
-    this->is_active = false;
-    this->GetMediaPlayer()->setMuted(true);
-    this->GetMediaPlayer()->play();
-
     // Wait for position to be set (and required flag set to false
-    std::cout << "Player " << this->player_index << ": Waiting to position to be set" << std::endl;
-    while (this->position_set_required)
+    this->PrintDebug("Waiting to duration to be set.");
+    while (this->track_duration == 0)
         // Wait for 50ms
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
+    this->PrintDebug("Duration set.");
 
-    this->GetMediaPlayer()->pause();
-    this->GetMediaPlayer()->setMuted(was_muted);
+    this->GetMediaPlayer()->stop();
+    this->GetMediaPlayer()->setVolume(old_volume);
     this->is_active = was_active;
 }
 
@@ -182,23 +185,15 @@ void Player::SetPosition()
     }
 }
 
-void Player::SetPositionSetRequiredFlag()
-{
-    this->position_set_required = true;
-}
-
 void Player::Play()
 {
-    this->SetPosition();
+    //this->SetPosition();
 
     this->GetMediaPlayer()->play();
     if (this->GetMediaPlayer()->error())
         this->main_window->DisplayError(this->GetMediaPlayer()->errorString());
     else if (this->GetMediaPlayer()->state() != QMediaPlayer::PlayingState)
         this->main_window->DisplayError("Not playing");
-
-    // Enable interupts, as no longer expecting media changes.
-    this->media_interupts_enabled = true;
 }
 
 Player::~Player()

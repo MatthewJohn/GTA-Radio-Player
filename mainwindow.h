@@ -17,6 +17,7 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QSettings>
+#include <QTimer>
 
 #include "player.h"
 
@@ -67,6 +68,7 @@ public slots:
     void OpenChangeDirectory();
     void ResetGlobalTimer();
     void ToggleAlwaysOnTop(bool new_value);
+    void PostStartup();
 
 
 private:
