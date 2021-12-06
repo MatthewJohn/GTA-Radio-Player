@@ -57,6 +57,7 @@ public slots:
     void NextStation();
     void PreviousStation();
     void VolumeDialChangeSlot();
+    void PlayPauseButtonSlot();
     // Slots for menu items
     void OpenChangeDirectory();
     void ResetGlobalTimer();
@@ -130,6 +131,7 @@ private:
 
     QDial* GetVolumeDial();
     QPushButton* GetMuteButton();
+    QPushButton* GetPlayPauseButton();
     QPushButton* GetNextButton();
     QPushButton* GetPreviousButton();
     QLabel* GetPositionLabel();

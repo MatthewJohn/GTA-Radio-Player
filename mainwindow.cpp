@@ -72,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(NextStation()));
     QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(PreviousStation()));
     QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged(int)), this, SLOT(VolumeDialChangeSlot()));
+    QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(PlayPauseButtonSlot()));
 
     // Menu item
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
@@ -89,6 +90,10 @@ void MainWindow::OnMediaStateChange(QMediaPlayer::State newState) {
         std::cout << "Interupts enabled, restarting current player" << std::endl;
         this->GetCurrentPlayer()->play();
     }
+}
+
+void MainWindow::PlayPauseButtonSlot() {
+
 }
 
 void MainWindow::DisableMediaInterupts() {
@@ -260,6 +265,7 @@ bool MainWindow::IsPlaying()
 void MainWindow::DisableMediaButtons()
 {
     this->GetMuteButton()->setEnabled(false);
+    this->GetPlayPauseButton()->setEnabled(false);
     this->GetPreviousButton()->setEnabled(false);
     this->GetNextButton()->setEnabled(false);
     this->GetVolumeDial()->setEnabled(false);
@@ -268,6 +274,7 @@ void MainWindow::DisableMediaButtons()
 void MainWindow::EnableMediaButtons()
 {
     this->GetMuteButton()->setEnabled(true);
+    this->GetPlayPauseButton()->setEnabled(true);
     this->GetPreviousButton()->setEnabled(true);
     this->GetNextButton()->setEnabled(true);
     this->GetVolumeDial()->setEnabled(true);
@@ -455,6 +462,11 @@ void MainWindow::VolumeDialChangeSlot()
 QPushButton* MainWindow::GetMuteButton()
 {
     return this->findChild<QPushButton *>("muteButton");
+}
+
+QPushButton* MainWindow::GetPlayPauseButton()
+{
+    return this->findChild<QPushButton *>("playPauseButton");
 }
 
 QPushButton* MainWindow::GetNextButton()
