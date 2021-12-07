@@ -153,7 +153,6 @@ void Player::PrepareFlipTo(QUrl url)
     this->GetMediaPlayer()->pause();
     this->PrintDebug("Duration set.");
 
-    this->GetMediaPlayer()->stop();
     this->GetMediaPlayer()->setVolume(old_volume);
     this->is_active = was_active;
 }
