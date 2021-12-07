@@ -122,6 +122,7 @@ void MainWindow::DisablePlayer()
 
 void MainWindow::Pause()
 {
+    this->GetPlayPauseButton()->setText("Play");
     this->is_playing = false;
     this->GetCurrentPlayer()->Pause();
 }
@@ -239,6 +240,8 @@ void MainWindow::Play()
 
     this->is_playing = true;
     this->GetCurrentPlayer()->Play();
+
+    this->GetPlayPauseButton()->setText("Pause");
 }
 
 void MainWindow::SetMute(bool muted)
