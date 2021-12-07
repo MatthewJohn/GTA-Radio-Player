@@ -25,7 +25,7 @@ void Player::Setup(MainWindow* main_window, int player_index)
 
 void Player::OnMediaStatusChange(QMediaPlayer::MediaStatus status)
 {
-    std::cout << "Player " << this-> player_index << ": State: " << status << std::endl;
+    this->PrintDebug("State: " + QString::number(status));
     if (status == QMediaPlayer::LoadedMedia)
         this->media_loaded = true;
     else if (status == QMediaPlayer::BufferedMedia)
@@ -81,16 +81,17 @@ void Player::OnPositionChanged(qint64 new_position)
 
 
 void Player::OnDurationChange(qint64 new_duration) {
-    std::cout << "Player " << this-> player_index << ": OnDurationChange called: " << new_duration << std::endl;
+    this->PrintDebug("OnDurationChange called: " + QString::number(new_duration));
     this->track_duration = new_duration;
 }
 
 void Player::OnStateChanged(QMediaPlayer::State newState) {
-    std::cout << "Player " << this-> player_index << ": Media State: " << newState << std::endl;
+    this->PrintDebug("Media State: " + QString::number(newState));
+
     // If interupts are disabled (when swapping players), if some comes to an end,
     // start the player again.
     if (this->media_interupts_enabled && newState == QMediaPlayer::StoppedState) {
-        std::cout << "Interupts enabled, restarting current player" << std::endl;
+        this->PrintDebug("Interupts enabled, resarting current player.");
         this->GetMediaPlayer()->play();
     }
 }
@@ -180,9 +181,9 @@ void Player::SetPosition()
     if (tts > 0)
     {
         qint64 dur = this->GetMediaPlayer()->duration();
-        std::cout << "Track duration: " << this->GetMediaPlayer()->duration() << std::endl;
+        this->PrintDebug("Track duration: " + QString::number(this->GetMediaPlayer()->duration()) + ".");
         if (dur > 0) {
-            std::cout << "Setting track to position: " << tts % this->GetMediaPlayer()->duration() << std::endl;
+            this->PrintDebug("Setting track to position: " + QString::number(tts % this->GetMediaPlayer()->duration()));
             this->GetMediaPlayer()->setPosition(tts % this->GetMediaPlayer()->duration());
         }
     }
