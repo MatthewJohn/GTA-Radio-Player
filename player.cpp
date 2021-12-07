@@ -115,6 +115,12 @@ void Player::PrepareFlipTo(QUrl url)
     this->PrintDebug("Loading file: " + url.url());
     this->GetMediaPlayer()->setMedia(url);
 
+    // Check for any errors after loading media
+    if (this->GetMediaPlayer()->error())
+        this->main_window->DisplayError(this->GetMediaPlayer()->errorString());
+    else if (this->GetMediaPlayer()->state() != QMediaPlayer::PlayingState)
+        this->main_window->DisplayError("Not playing");
+
     this->PrintDebug("Waiting for media to load.");
     while (this->media_loaded == false)
         // Wait for 50ms
@@ -194,13 +200,7 @@ void Player::SetPosition()
 
 void Player::Play()
 {
-    //this->SetPosition();
-
     this->GetMediaPlayer()->play();
-    if (this->GetMediaPlayer()->error())
-        this->main_window->DisplayError(this->GetMediaPlayer()->errorString());
-    else if (this->GetMediaPlayer()->state() != QMediaPlayer::PlayingState)
-        this->main_window->DisplayError("Not playing");
 }
 
 Player::~Player()
