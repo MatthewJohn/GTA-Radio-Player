@@ -86,7 +86,11 @@ void MainWindow::PostStartup()
 }
 
 void MainWindow::PlayPauseButtonSlot() {
-
+    if (this->IsPlaying()) {
+        this->Pause();
+    } else {
+        this->Play();
+    }
 }
 
 qint64 MainWindow::GetStartupTime()
