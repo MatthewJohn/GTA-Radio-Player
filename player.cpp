@@ -186,7 +186,7 @@ void Player::SetPosition()
     // Set position based on time since application startup, using modulus of track length.
     // Ignore tts less than 0, maybe due to time change or race condition
     qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->main_window->GetStartupTime());
-    if (tts > 0)
+    if (tts >= 0)
     {
         qint64 dur = this->GetMediaPlayer()->duration();
         this->PrintDebug("Track duration: " + QString::number(this->GetMediaPlayer()->duration()) + ".");
