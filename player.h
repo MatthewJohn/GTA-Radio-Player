@@ -27,6 +27,7 @@ public:
     void FlipTo(bool was_playing);
     void Play();
     void Pause();
+    void SetPosition();
 
 public slots:
     // Slots for media events
@@ -44,7 +45,6 @@ private:
     bool media_loaded;
     bool media_buffered;
     qint64 track_duration;
-    void SetPosition();
     void PrintDebug(QString debug);
 
 };

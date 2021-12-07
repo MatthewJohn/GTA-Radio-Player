@@ -69,8 +69,6 @@ public slots:
     void OpenChangeDirectory();
     void ResetGlobalTimer();
     void ToggleAlwaysOnTop(bool new_value);
-    void PostStartup();
-
 
 private:
     Ui::MainWindow *ui;
