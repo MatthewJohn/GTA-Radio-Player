@@ -122,7 +122,7 @@ void Player::PrepareFlipTo(QUrl url)
     this->PrintDebug("Media loaded.");
 
     // Play track
-    this->is_active = true;
+    this->is_active = false;
     this->GetMediaPlayer()->setVolume(0);
     this->GetMediaPlayer()->play();
 
@@ -133,8 +133,8 @@ void Player::PrepareFlipTo(QUrl url)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
     this->PrintDebug("Media buffered.");
 
-    // Wait for position to be set (and required flag set to false
-    this->PrintDebug("Waiting to duration to be set.");
+    // Wait for position to be set (and required flag set to false)
+    this->PrintDebug("Waiting for duration to be set.");
     while (this->track_duration == 0)
         // Wait for 50ms
         QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
