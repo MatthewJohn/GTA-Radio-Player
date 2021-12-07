@@ -118,26 +118,33 @@ void Player::PrepareFlipTo(QUrl url)
     this->PrintDebug("Waiting for media to load.");
     while (this->media_loaded == false)
         // Wait for 50ms
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
     this->PrintDebug("Media loaded.");
 
     // Play track
     this->is_active = false;
-    this->GetMediaPlayer()->setVolume(0);
-    this->GetMediaPlayer()->play();
+    this->GetMediaPlayer()->pause();
 
     // Wait for media to buffer
     this->PrintDebug("Waiting for media to buffer.");
     while (this->media_buffered == false)
         // Wait for 50ms
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
     this->PrintDebug("Media buffered.");
 
     // Wait for position to be set (and required flag set to false)
+    // @TODO: Do not play audio with minimal volume - this will be audible to the user.
+    // This is required as the duration will not be populated (nor will the durationChanged
+    // slot be called) if: media is paused instead of played, mediaplayer volume is set to 0
+    // or mediaplayer is set to muted.
+    // Therefore, this is the only way to be able to obtain the duration of the track.
+    this->GetMediaPlayer()->setVolume(1);
+    this->GetMediaPlayer()->play();
     this->PrintDebug("Waiting for duration to be set.");
     while (this->track_duration == 0)
         // Wait for 50ms
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 200);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+    this->GetMediaPlayer()->pause();
     this->PrintDebug("Duration set.");
 
     this->GetMediaPlayer()->stop();
