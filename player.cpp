@@ -6,7 +6,6 @@ Player::Player()
     this->player = new QMediaPlayer;
     this->is_active = false;
     this->media_interupts_enabled = false;
-    this->position_set_required = false;
     this->media_buffered = false;
     this->media_loaded = false;
     this->track_duration = 0;
@@ -84,10 +83,6 @@ void Player::OnPositionChanged(qint64 new_position)
 void Player::OnDurationChange(qint64 new_duration) {
     std::cout << "Player " << this-> player_index << ": OnDurationChange called: " << new_duration << std::endl;
     this->track_duration = new_duration;
-    if (this->position_set_required) {
-        // Re-disable callback
-        this->position_set_required = false;
-    }
 }
 
 void Player::OnStateChanged(QMediaPlayer::State newState) {
@@ -102,8 +97,6 @@ void Player::OnStateChanged(QMediaPlayer::State newState) {
 
 void Player::PrepareFlipTo(QUrl url)
 {
-    this->position_set_required = true;
-
     this->media_loaded = false;
     this->media_buffered = false;
     this->track_duration = 0;
