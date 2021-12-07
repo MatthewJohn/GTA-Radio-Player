@@ -94,7 +94,6 @@ qint64 MainWindow::GetStartupTime()
     return this->startupTime;
 }
 
-
 void MainWindow::UpdateDirectory(QString new_directory, int station_index)
 {
     this->settings->setValue(SETTINGS_KEY_DIRECTORY, new_directory);
@@ -123,7 +122,8 @@ void MainWindow::DisablePlayer()
 
 void MainWindow::Pause()
 {
-    this->GetCurrentPlayer()->GetMediaPlayer()->pause();
+    this->is_playing = false;
+    this->GetCurrentPlayer()->Pause();
 }
 
 void MainWindow::OpenChangeDirectory()
@@ -206,7 +206,7 @@ bool MainWindow::IsPlaying()
     if (! this->IsPlayAvailable())
         return false;
 
-    return (this->GetCurrentPlayer()->GetMediaPlayer()->state() == QMediaPlayer::PlayingState);
+    return this->is_playing;
 }
 
 void MainWindow::DisableMediaButtons()
@@ -237,6 +237,7 @@ void MainWindow::Play()
     if (! this->IsPlayAvailable())
         return;
 
+    this->is_playing = true;
     this->GetCurrentPlayer()->Play();
 }
 

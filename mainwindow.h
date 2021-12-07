@@ -112,6 +112,7 @@ private:
     void SetStartupTime(bool force_reset);
 
     // Play
+    bool is_playing;
     void Play();
     void Pause();
     void SetMute(bool muted);

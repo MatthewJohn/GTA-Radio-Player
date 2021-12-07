@@ -26,6 +26,7 @@ public:
     void FlipFrom(bool was_playing);
     void FlipTo(bool was_playing);
     void Play();
+    void Pause();
 
 public slots:
     // Slots for media events
