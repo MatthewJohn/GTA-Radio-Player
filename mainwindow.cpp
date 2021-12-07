@@ -69,12 +69,6 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->reset_global_timer, SIGNAL(triggered(bool)), this, SLOT(ResetGlobalTimer()));
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
 
-    // Schedule function call which takes places immediately during execution of application
-    QTimer::singleShot(0, this, SLOT(PostStartup()));
-}
-
-void MainWindow::PostStartup()
-{
     // Select initial station.
     // This must be done after initial startup as MediaPlayer objects do not full function till
     // application is running (e.g. get duration of song).
