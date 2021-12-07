@@ -138,9 +138,7 @@ void MainWindow::ResetGlobalTimer()
     if (! this->IsPlayAvailable())
         return;
 
-    // Pause current song
-    this->GetCurrentPlayer()->GetMediaPlayer()->pause();
-    this->Play();
+    this->GetCurrentPlayer()->SetPosition();
 }
 
 void MainWindow::SetStartupTime(bool force_reset)
