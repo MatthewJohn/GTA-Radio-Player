@@ -98,6 +98,7 @@ void Player::OnStateChanged(QMediaPlayer::State newState) {
 
 void Player::PrepareFlipTo(QUrl url)
 {
+    this->PrintDebug("Starting PrepareFlipTo.");
     this->media_loaded = false;
     this->media_buffered = false;
     this->track_duration = 0;
@@ -147,6 +148,8 @@ void Player::PrepareFlipTo(QUrl url)
 
     this->GetMediaPlayer()->setVolume(old_volume);
     this->is_active = was_active;
+
+    this->PrintDebug("Finished PrepareFlipTo.");
 }
 
 void Player::PrintDebug(QString debug)
@@ -156,13 +159,18 @@ void Player::PrintDebug(QString debug)
 
 void Player::FlipFrom(bool was_playing)
 {
+    this->PrintDebug("Starting FipFrom.");
+
     this->media_interupts_enabled = false;
     if (was_playing)
         this->player->pause();
+
+    this->PrintDebug("Finished FipFrom.");
 }
 
 void Player::FlipTo(bool was_playing)
 {
+    this->PrintDebug("Starting FlipTo.");
     this->SetPosition();
 
     this->is_active = true;
@@ -170,11 +178,11 @@ void Player::FlipTo(bool was_playing)
         this->Play();
 
     this->media_interupts_enabled = true;
+    this->PrintDebug("Finished FlipTo.");
 }
 
 void Player::SetPosition()
 {
-
     // Set position based on time since application startup, using modulus of track length.
     // Ignore tts less than 0, maybe due to time change or race condition
     qint64 tts = (QDateTime::currentMSecsSinceEpoch() - this->main_window->GetStartupTime());
