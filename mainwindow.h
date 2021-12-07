@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <iostream>
-#include <cmath>
+
 #include <QMainWindow>
 #include <QDirIterator>
 #include <QDebug>
@@ -17,6 +17,9 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QSettings>
+#include <QTimer>
+
+#include "player.h"
 
 #define MAX_STATIONS 20
 #define INITIAL_VOLUME 40
@@ -51,6 +54,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    QLabel* GetPositionLabel();
+    qint64 GetStartupTime();
+    void DisplayError(QString err);
+
 public slots:
     // Slots for controls
     void MuteButtonSlot();
@@ -61,9 +68,8 @@ public slots:
     void OpenChangeDirectory();
     void ResetGlobalTimer();
     void ToggleAlwaysOnTop(bool new_value);
-    // Slots for media events
-    void OnMediaStateChange(QMediaPlayer::State newState);
-    void OnPositionChanged(qint64 new_position);
+    void PostStartup();
+
 
 private:
     Ui::MainWindow *ui;
@@ -85,12 +91,10 @@ private:
     QSettings *settings;
 
     // player object
-    QMediaPlayer *players[2];
+    Player *players[2];
     int currentPlayerItx;
-    QMediaPlayer* GetCurrentPlayer();
-    QMediaPlayer* GetNextPlayer();
-    void FlipPlayer();
-    QMetaObject::Connection position_change_connection;
+    Player* GetCurrentPlayer();
+    Player* GetNextPlayer();
 
     // List of stations
     QString stationFiles[MAX_STATIONS];
@@ -108,12 +112,12 @@ private:
 
     // Play
     void Play();
+    void Pause();
     void SetMute(bool muted);
     void SetVolume(qint64 new_volume);
     bool IsPlayAvailable();
     bool IsPlaying();
     void SelectStation(int station_index);
-    void SetCurrentPlayerPosition();
     QString GetMediaName();
 
     int LoadCurrentStation();
@@ -122,20 +126,17 @@ private:
     void DisableMediaButtons();
     void EnableMediaButtons();
 
-    bool mediaStateChangeInteruptEnabled;
     void DisableMediaInterupts();
     void EnableMediaInterupts();
 
-    void SetDisplay(QString text);
 
     QDial* GetVolumeDial();
     QPushButton* GetMuteButton();
     QPushButton* GetNextButton();
     QPushButton* GetPreviousButton();
-    QLabel* GetPositionLabel();
     QLabel* GetDisplay();
 
-    void DisplayError(QString err);
+    void SetDisplay(QString text);
     void DisplayInfo(QString info);
 
 };
