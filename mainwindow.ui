@@ -86,7 +86,7 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>130</width>
+      <width>161</width>
       <height>25</height>
      </rect>
     </property>
@@ -96,6 +96,13 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="font">
+     <font>
+      <family>Mitra Mono</family>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="whatsThis">
      <string>Station Name</string>
     </property>
@@ -104,19 +111,6 @@
     </property>
     <property name="margin">
      <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="positionLabel">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>0</y>
-      <width>120</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0:00:00 / 0:00:00</string>
     </property>
    </widget>
    <widget class="QPushButton" name="playPauseButton">
@@ -141,6 +135,26 @@
       <height>25</height>
      </rect>
     </property>
+    <widget class="QLabel" name="positionLabel">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>0</y>
+       <width>141</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Mitra Mono</family>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>0:00:00 / 0:00:00</string>
+     </property>
+    </widget>
    </widget>
    <zorder>volumeDial</zorder>
    <zorder>muteButton</zorder>
@@ -148,7 +162,6 @@
    <zorder>prevButton</zorder>
    <zorder>playPauseButton</zorder>
    <zorder>displayBackground</zorder>
-   <zorder>positionLabel</zorder>
    <zorder>display</zorder>
   </widget>
   <action name="actionChange_MP3_Directory">
