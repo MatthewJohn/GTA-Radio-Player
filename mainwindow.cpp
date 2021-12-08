@@ -320,13 +320,13 @@ void MainWindow::SelectStation(int station_index)
     this->currentStation = station_index;
     this->SaveCurrentStation();
 
+    this->SetDisplay("Re-tuning...");
+
     this->GetNextPlayer()->PrepareFlipTo(QUrl::fromLocalFile(this->stationFiles[station_index]));
 
     // Pause old player, start new one and flip
     bool was_playing = this->IsPlaying();
     this->GetCurrentPlayer()->FlipFrom(was_playing);
-
-    this->SetDisplay("Re-tuning...");
 
     // Pause for dramatic effect!
     qint64 start_pause = QDateTime::currentMSecsSinceEpoch();
