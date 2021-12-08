@@ -132,6 +132,24 @@
      <string>Play</string>
     </property>
    </widget>
+   <widget class="QWidget" name="displayBackground" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>330</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>volumeDial</zorder>
+   <zorder>muteButton</zorder>
+   <zorder>nextButton</zorder>
+   <zorder>prevButton</zorder>
+   <zorder>playPauseButton</zorder>
+   <zorder>displayBackground</zorder>
+   <zorder>positionLabel</zorder>
+   <zorder>display</zorder>
   </widget>
   <action name="actionChange_MP3_Directory">
    <property name="text">
