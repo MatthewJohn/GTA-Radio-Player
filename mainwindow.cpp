@@ -91,6 +91,10 @@ void MainWindow::PlayPauseButtonSlot() {
 
 qint64 MainWindow::GetStartupTime()
 {
+    // If currently paused and pause time has been set,
+    // report startup time with offset since start of pause.
+    if (! this->IsPlaying() && this->pause_time != 0)
+        return this->startupTime + (QDateTime::currentMSecsSinceEpoch() - this->pause_time);
     return this->startupTime;
 }
 
@@ -242,7 +246,7 @@ void MainWindow::Play()
         // If previous paused by user and pause_time was set,
         // add the amount of time paused to the global timer,
         // so the position of tracks won't have changed.
-        this->SetStartupTime(true, this->GetStartupTime() + (QDateTime::currentMSecsSinceEpoch() - this->pause_time));
+        this->SetStartupTime(true, this->GetStartupTime());
         this->pause_time = 0;
     }
 
