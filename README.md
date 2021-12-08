@@ -6,7 +6,7 @@ A (very very) basic mp3 player, which keeps a global track position when switchi
 
 The goal is to achieve a similar experience to playing the radio in Grand Theft Auto.
 
-[Screenshot](/Docs/Screenshot.png)
+![Screenshot](/Docs/Screenshot.png "Screenshot")
 
 ## Building
 
