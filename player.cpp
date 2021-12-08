@@ -204,6 +204,11 @@ void Player::Play()
             this->main_window->DisplayError("Not playing");
 }
 
+void Player::Pause()
+{
+    this->GetMediaPlayer()->pause();
+}
+
 Player::~Player()
 {
 }

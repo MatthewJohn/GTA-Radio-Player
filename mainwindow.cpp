@@ -26,12 +26,14 @@ MainWindow::MainWindow(QWidget *parent)
     this->players[1] = new Player;
     this->players[1]->Setup(this, 2);
     this->currentPlayerItx = 0;
+    this->pause_time = 0;
+    this->is_playing = false;
 
     this->GetVolumeDial()->setValue(this->settings->value(SETTINGS_KEY_VOLUME, INITIAL_VOLUME).toInt());
     this->VolumeDialChangeSlot();
 
     // Set startup time
-    this->SetStartupTime(false);
+    this->SetStartupTime(false, 0);
 
     // Set background colour of display label
     this->GetDisplay()->setStyleSheet("QLabel { background-color: white; margin: 1px; }");
@@ -63,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->GetPreviousButton(), SIGNAL(clicked()), this, SLOT(NextStation()));
     QObject::connect(this->GetNextButton(), SIGNAL(clicked()), this, SLOT(PreviousStation()));
     QObject::connect(this->GetVolumeDial(), SIGNAL(valueChanged(int)), this, SLOT(VolumeDialChangeSlot()));
+    QObject::connect(this->GetPlayPauseButton(), SIGNAL(clicked()), this, SLOT(PlayPauseButtonSlot()));
 
     // Menu item
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
@@ -78,11 +81,22 @@ MainWindow::MainWindow(QWidget *parent)
     this->Play();
 }
 
-qint64 MainWindow::GetStartupTime()
-{
-    return this->startupTime;
+void MainWindow::PlayPauseButtonSlot() {
+    if (this->IsPlaying()) {
+        this->Pause();
+    } else {
+        this->Play();
+    }
 }
 
+qint64 MainWindow::GetStartupTime()
+{
+    // If currently paused and pause time has been set,
+    // report startup time with offset since start of pause.
+    if (! this->IsPlaying() && this->pause_time != 0)
+        return this->startupTime + (QDateTime::currentMSecsSinceEpoch() - this->pause_time);
+    return this->startupTime;
+}
 
 void MainWindow::UpdateDirectory(QString new_directory, int station_index)
 {
@@ -112,7 +126,10 @@ void MainWindow::DisablePlayer()
 
 void MainWindow::Pause()
 {
-    this->GetCurrentPlayer()->GetMediaPlayer()->pause();
+    this->GetPlayPauseButton()->setText("Play");
+    this->is_playing = false;
+    this->pause_time = QDateTime::currentMSecsSinceEpoch();
+    this->GetCurrentPlayer()->Pause();
 }
 
 void MainWindow::OpenChangeDirectory()
@@ -132,7 +149,7 @@ void MainWindow::OpenChangeDirectory()
 
 void MainWindow::ResetGlobalTimer()
 {
-    this->SetStartupTime(true);
+    this->SetStartupTime(true, 0);
 
     // Restart current station
     if (! this->IsPlayAvailable())
@@ -141,7 +158,7 @@ void MainWindow::ResetGlobalTimer()
     this->GetCurrentPlayer()->SetPosition();
 }
 
-void MainWindow::SetStartupTime(bool force_reset)
+void MainWindow::SetStartupTime(bool force_reset, qint64 new_time)
 {
     qint64 current_epoc = QDateTime::currentMSecsSinceEpoch();  // Get current EPOC
     this->startupTime = this->settings->value(SETTINGS_KEY_START_EPOC, 0).toLongLong();  // Obtain stored value, using current epoc as default
@@ -150,7 +167,7 @@ void MainWindow::SetStartupTime(bool force_reset)
     if (this->startupTime == 0 || force_reset)
     {
         std::cout << "Resetting startupTime to epoc: " << current_epoc << std::endl;
-        this->startupTime = current_epoc;
+        this->startupTime = new_time == 0 ? current_epoc : new_time;
         this->settings->setValue(SETTINGS_KEY_START_EPOC, this->startupTime);  // If setting used the deafult, save it.
     }
 }
@@ -193,12 +210,13 @@ bool MainWindow::IsPlaying()
     if (! this->IsPlayAvailable())
         return false;
 
-    return (this->GetCurrentPlayer()->GetMediaPlayer()->state() == QMediaPlayer::PlayingState);
+    return this->is_playing;
 }
 
 void MainWindow::DisableMediaButtons()
 {
     this->GetMuteButton()->setEnabled(false);
+    this->GetPlayPauseButton()->setEnabled(false);
     this->GetPreviousButton()->setEnabled(false);
     this->GetNextButton()->setEnabled(false);
     this->GetVolumeDial()->setEnabled(false);
@@ -207,6 +225,7 @@ void MainWindow::DisableMediaButtons()
 void MainWindow::EnableMediaButtons()
 {
     this->GetMuteButton()->setEnabled(true);
+    this->GetPlayPauseButton()->setEnabled(true);
     this->GetPreviousButton()->setEnabled(true);
     this->GetNextButton()->setEnabled(true);
     this->GetVolumeDial()->setEnabled(true);
@@ -222,7 +241,19 @@ void MainWindow::Play()
     if (! this->IsPlayAvailable())
         return;
 
+    if (this->pause_time)
+    {
+        // If previous paused by user and pause_time was set,
+        // add the amount of time paused to the global timer,
+        // so the position of tracks won't have changed.
+        this->SetStartupTime(true, this->GetStartupTime());
+        this->pause_time = 0;
+    }
+
+    this->is_playing = true;
     this->GetCurrentPlayer()->Play();
+
+    this->GetPlayPauseButton()->setText("Pause");
 }
 
 void MainWindow::SetMute(bool muted)
@@ -360,6 +391,11 @@ void MainWindow::VolumeDialChangeSlot()
 QPushButton* MainWindow::GetMuteButton()
 {
     return this->findChild<QPushButton *>("muteButton");
+}
+
+QPushButton* MainWindow::GetPlayPauseButton()
+{
+    return this->findChild<QPushButton *>("playPauseButton");
 }
 
 QPushButton* MainWindow::GetNextButton()

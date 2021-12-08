@@ -64,6 +64,7 @@ public slots:
     void NextStation();
     void PreviousStation();
     void VolumeDialChangeSlot();
+    void PlayPauseButtonSlot();
     // Slots for menu items
     void OpenChangeDirectory();
     void ResetGlobalTimer();
@@ -106,9 +107,11 @@ private:
     void UpdateDirectory(QString new_directory, int station_index);
 
     qint64 startupTime;
-    void SetStartupTime(bool force_reset);
+    void SetStartupTime(bool force_reset, qint64 new_time);
 
     // Play
+    bool is_playing;
+    qint64 pause_time;
     void Play();
     void Pause();
     void SetMute(bool muted);
@@ -130,6 +133,7 @@ private:
 
     QDial* GetVolumeDial();
     QPushButton* GetMuteButton();
+    QPushButton* GetPlayPauseButton();
     QPushButton* GetNextButton();
     QPushButton* GetPreviousButton();
     QLabel* GetDisplay();
