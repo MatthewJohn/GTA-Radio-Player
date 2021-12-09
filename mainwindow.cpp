@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -35,33 +36,6 @@ MainWindow::MainWindow(QWidget *parent)
     // Set startup time
     this->SetStartupTime(false, 0);
 
-    // Set background colour of display label
-    this->GetDisplay()->setStyleSheet("QLabel {"
-                                        "background-color: #000012;"
-                                        "margin: 1px;"
-                                        "color: #ff4df0;"
-                                      "}");
-    this->GetPositionLabel()->setStyleSheet("QLabel {"
-                                      "background-color: #000012;"
-                                      "margin: 1px;"
-                                      "color: #ff4df0;"
-                                      "}");
-    this->GetDisplayBackgroundWidget()->setStyleSheet("QWidget {"
-                                                        "background-color: #000012;"
-                                                      "}");
-    this->GetBackgroundWidget()->setStyleSheet(
-        "QWidget {"
-          "background-color: #1d269b;"
-        "}"
-        "QPushButton {"
-          "background-color: #9d4dff;"
-          "color: #70ffdf;"
-        "}"
-        "QDial {"
-          "background-color: #ff4df0;"
-        "}"
-    );
-
     this->change_directory_action = new QAction(0);
     this->change_directory_action->setText("Change Directory");
 
@@ -79,10 +53,29 @@ MainWindow::MainWindow(QWidget *parent)
     this->file_menu->addAction(this->reset_global_timer);
     this->file_menu->addAction(this->always_on_top_action);
 
+    this->vice_theme_action = new QAction(0);
+    this->vice_theme_action->setText("Vice City");
+    this->vice_theme_action->setCheckable(true);
+
+    this->sa_theme_action = new QAction(0);
+    this->sa_theme_action->setText("San Andreas");
+    this->sa_theme_action->setCheckable(true);
+
+    this->theme_menu = new QMenu();
+    this->theme_menu->setTitle("Theme");
+    this->theme_menu->addAction(this->vice_theme_action);
+    this->theme_menu->addAction(this->sa_theme_action);
+
     this->menu_bar = new QMenuBar(0);
     this->menu_bar->setNativeMenuBar(false);
     this->menu_bar->addMenu(this->file_menu);
+    this->menu_bar->addMenu(this->theme_menu);
     this->setMenuBar(this->menu_bar);
+
+    // Update UI theme to saved value (or default).
+    // Must be performed after menu setup, as it select/de-selects
+    // the menu actions.
+    this->UpdateUiTheme(this->settings->value(SETTINGS_KEY_THEME, THEME_DEFAULT).toString());
 
     // Bind knobs
     QObject::connect(this->GetMuteButton(), SIGNAL(clicked()), this, SLOT(MuteButtonSlot()));
@@ -95,6 +88,8 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->change_directory_action, SIGNAL(triggered(bool)), this, SLOT(OpenChangeDirectory()));
     QObject::connect(this->reset_global_timer, SIGNAL(triggered(bool)), this, SLOT(ResetGlobalTimer()));
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
+    QObject::connect(this->vice_theme_action, SIGNAL(triggered(bool)), this, SLOT(ViceThemeSelectSlot()));
+    QObject::connect(this->sa_theme_action, SIGNAL(triggered(bool)), this, SLOT(SaThemeSelectSlot()));
 
     // Select initial station.
     // This must be done after initial startup as MediaPlayer objects do not full function till
@@ -112,6 +107,100 @@ void MainWindow::PlayPauseButtonSlot() {
         this->Play();
     }
 }
+
+void MainWindow::ViceThemeSelectSlot()
+{
+    this->SetTheme(THEME_VICE);
+}
+void MainWindow::SaThemeSelectSlot()
+{
+    this->SetTheme(THEME_SA);
+}
+
+void MainWindow::SetTheme(QString theme_name)
+{
+    // Update theme in settings.
+    this->settings->setValue(SETTINGS_KEY_THEME, theme_name);
+    this->UpdateUiTheme(theme_name);
+}
+
+void MainWindow::UpdateUiTheme(QString theme_name)
+{
+    std::cout << "Setting theme to: " << theme_name.toStdString() << std::endl;
+
+    // Deselect all UI Theme buttons
+    this->vice_theme_action->setChecked(false);
+    this->sa_theme_action->setChecked(false);
+
+    if (theme_name.toStdString() == THEME_VICE)
+    {
+        this->vice_theme_action->setChecked(true);
+
+        // Set background colour of display label
+        this->GetDisplay()->setStyleSheet("QLabel {"
+                                            "background-color: #000012;"
+                                            "margin: 1px;"
+                                            "color: #ff4df0;"
+                                          "}");
+        this->GetPositionLabel()->setStyleSheet("QLabel {"
+                                          "background-color: #000012;"
+                                          "margin: 1px;"
+                                          "color: #ff4df0;"
+                                          "}");
+        this->GetDisplayBackgroundWidget()->setStyleSheet("QWidget {"
+                                                            "background-color: #000012;"
+                                                          "}");
+        this->GetBackgroundWidget()->setStyleSheet(
+            "QWidget {"
+              "background-color: #1d269b;"
+            "}"
+            "QPushButton {"
+              "background-color: #9d4dff;"
+              "color: #70ffdf;"
+            "}"
+            "QDial {"
+              "background-color: #ff4df0;"
+            "}"
+        );
+    }
+    else if (theme_name.toStdString() == THEME_SA)
+    {
+        this->sa_theme_action->setChecked(true);
+
+        // Set background colour of display label
+        this->GetDisplay()->setStyleSheet("QLabel {"
+                                            "background-color: #000000;"
+                                            "margin: 1px;"
+                                            "color: #20d633;"
+                                          "}");
+        this->GetPositionLabel()->setStyleSheet("QLabel {"
+                                          "background-color: #000012;"
+                                          "margin: 1px;"
+                                          "color: #20d633;"
+                                          "}");
+        this->GetDisplayBackgroundWidget()->setStyleSheet("QWidget {"
+                                                            "background-color: #000012;"
+                                                          "}");
+        this->GetBackgroundWidget()->setStyleSheet(
+            "QWidget {"
+              "background-color: #000000;"
+            "}"
+            "QPushButton {"
+              "background-color: #000000;"
+              "color: #eeeeee;"
+    //          "border-style: solid;"
+    //          "border-width: 1px;"
+    //          "border-color: red;"
+            "}"
+            "QDial {"
+              "background-color: #000000;"
+            "}"
+        );
+    } else {
+        this->DisplayError("Unkown theme");
+    }
+}
+
 
 qint64 MainWindow::GetStartupTime()
 {

@@ -32,9 +32,14 @@
 #define SETTINGS_KEY_ALWAYS_ON_TOP "window/always_on_top"
 #define SETTINGS_KEY_START_EPOC "player/start_epoc"
 #define SETTINGS_KEY_CURRENT_STATION_INDEX "player/station_index"
+#define SETTINGS_KEY_THEME "player/theme"
 #define ORGANISATION "MatthewJohn"
 #define APP_NAME "GTA Radio Player"
 #define DEFAULT_ALWAYS_ON_TOP 0
+
+#define THEME_VICE "VICE"
+#define THEME_SA "SA"
+#define THEME_DEFAULT THEME_VICE
 
 #ifdef _WIN32
 #define INITIAL_DIRECTORY "."
@@ -69,6 +74,8 @@ public slots:
     void OpenChangeDirectory();
     void ResetGlobalTimer();
     void ToggleAlwaysOnTop(bool new_value);
+    void ViceThemeSelectSlot();
+    void SaThemeSelectSlot();
 
 private:
     Ui::MainWindow *ui;
@@ -85,6 +92,9 @@ private:
     QAction *change_directory_action;
     QAction *always_on_top_action;
     QAction *reset_global_timer;
+    QMenu* theme_menu;
+    QAction* vice_theme_action;
+    QAction* sa_theme_action;
 
     // Settings
     QSettings *settings;
@@ -130,6 +140,8 @@ private:
     void DisableMediaInterupts();
     void EnableMediaInterupts();
 
+    void SetTheme(QString theme_name);
+    void UpdateUiTheme(QString theme_name);
 
     QDial* GetVolumeDial();
     QPushButton* GetMuteButton();
