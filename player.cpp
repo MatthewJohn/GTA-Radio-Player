@@ -161,7 +161,9 @@ void Player::FlipFrom(bool was_playing)
 {
     this->PrintDebug("Starting FipFrom.");
 
+    this->is_active = false;
     this->media_interupts_enabled = false;
+
     if (was_playing)
         this->player->pause();
 
