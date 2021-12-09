@@ -81,38 +81,6 @@
      <string>Prev</string>
     </property>
    </widget>
-   <widget class="QLabel" name="display">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>161</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="font">
-     <font>
-      <family>Mitra Mono</family>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="whatsThis">
-     <string>Station Name</string>
-    </property>
-    <property name="text">
-     <string>GTA Radio Player</string>
-    </property>
-    <property name="margin">
-     <number>0</number>
-    </property>
-   </widget>
    <widget class="QPushButton" name="playPauseButton">
     <property name="geometry">
      <rect>
@@ -135,6 +103,38 @@
       <height>25</height>
      </rect>
     </property>
+    <widget class="QLabel" name="display">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>161</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <family>Mitra Mono</family>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="whatsThis">
+      <string>Station Name</string>
+     </property>
+     <property name="text">
+      <string>GTA Radio Player</string>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+    </widget>
     <widget class="QLabel" name="positionLabel">
      <property name="geometry">
       <rect>
