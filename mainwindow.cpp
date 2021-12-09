@@ -156,16 +156,18 @@ void MainWindow::UpdateUiTheme(QString theme_name)
                                           "}");
         this->GetDisplayBackgroundWidget()->setStyleSheet(
             "QWidget {"
-                "background-color: #70ffdf;"
-                "color: #ff4df0;"
+                //"background-color: #70ffdf;"
+                //"color: #ff4df0;"
+                  "background-color: #000012;"
+                  "color: #ff4df0;"
             "}");
         this->GetBackgroundWidget()->setStyleSheet(
             "QWidget {"
-              "background-color: #54c3bc;"
+              "background-color: #1d269b;"
             "}"
             "QPushButton {"
-              "background-color: #045ded;"
-              "color: #ffffff;"
+              "background-color: #9d4dff;"
+              "color: #70ffdf;"
 //              "background-color: #ffffff;"
 //              "color: #ff4df0;"
             "}"
@@ -174,6 +176,7 @@ void MainWindow::UpdateUiTheme(QString theme_name)
             "}"
         );
     }
+
     else if (theme_name.toStdString() == THEME_SA)
     {
         this->sa_theme_action->setChecked(true);
