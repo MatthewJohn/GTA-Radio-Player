@@ -37,16 +37,25 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set background colour of display label
     this->GetDisplay()->setStyleSheet("QLabel {"
-                                      "background-color: #000012;"
-                                      "margin: 1px;"
-                                      "color: #95c2c8;"
+                                        "margin: 1px;"
+                                        "color: #95c2c8;"
                                       "}");
     this->GetPositionLabel()->setStyleSheet("QLabel {"
                                       "background-color: #000012;"
                                       "margin: 1px;"
                                       "color: #95c2c8;"
                                       "}");
-    this->GetDisplayBackgroundWidget()->setStyleSheet("QWidget { background-color: #000012; }");
+    this->GetBackgroundWidget()->setStyleSheet(
+        "QWidget {"
+          "background-color: #000012;"
+        "}"
+        "QPushButton {"
+          "background-color: #fbad4b;"
+        "}"
+        "QDial {"
+          "background-color: #fbad4b;"
+        "}"
+    );
 
     this->change_directory_action = new QAction(0);
     this->change_directory_action->setText("Change Directory");
@@ -427,9 +436,9 @@ QLabel* MainWindow::GetPositionLabel()
     return this->findChild<QLabel *>("positionLabel");
 }
 
-QWidget* MainWindow::GetDisplayBackgroundWidget()
+QWidget* MainWindow::GetBackgroundWidget()
 {
-    return this->findChild<QWidget *>("displayBackground");
+    return this->findChild<QWidget *>("centralwidget");
 }
 
 void MainWindow::PopulateFileList()
