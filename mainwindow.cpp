@@ -61,10 +61,15 @@ MainWindow::MainWindow(QWidget *parent)
     this->sa_theme_action->setText("San Andreas");
     this->sa_theme_action->setCheckable(true);
 
+    this->plain_theme_action = new QAction(0);
+    this->plain_theme_action->setText("Plain");
+    this->plain_theme_action->setCheckable(true);
+
     this->theme_menu = new QMenu();
     this->theme_menu->setTitle("Theme");
     this->theme_menu->addAction(this->vice_theme_action);
     this->theme_menu->addAction(this->sa_theme_action);
+    this->theme_menu->addAction(this->plain_theme_action);
 
     this->menu_bar = new QMenuBar(0);
     this->menu_bar->setNativeMenuBar(false);
@@ -90,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this->always_on_top_action, SIGNAL(toggled(bool)), this, SLOT(ToggleAlwaysOnTop(bool)));
     QObject::connect(this->vice_theme_action, SIGNAL(triggered(bool)), this, SLOT(ViceThemeSelectSlot()));
     QObject::connect(this->sa_theme_action, SIGNAL(triggered(bool)), this, SLOT(SaThemeSelectSlot()));
+    QObject::connect(this->plain_theme_action, SIGNAL(triggered(bool)), this, SLOT(PlainThemeSelectSlot()));
 
     // Select initial station.
     // This must be done after initial startup as MediaPlayer objects do not full function till
@@ -116,6 +122,10 @@ void MainWindow::SaThemeSelectSlot()
 {
     this->SetTheme(THEME_SA);
 }
+void MainWindow::PlainThemeSelectSlot()
+{
+    this->SetTheme(THEME_PLAIN);
+}
 
 void MainWindow::SetTheme(QString theme_name)
 {
@@ -131,6 +141,7 @@ void MainWindow::UpdateUiTheme(QString theme_name)
     // Deselect all UI Theme buttons
     this->vice_theme_action->setChecked(false);
     this->sa_theme_action->setChecked(false);
+    this->plain_theme_action->setChecked(false);
 
     if (theme_name.toStdString() == THEME_VICE)
     {
@@ -196,6 +207,17 @@ void MainWindow::UpdateUiTheme(QString theme_name)
               "background-color: #000000;"
             "}"
         );
+    }
+    else if (theme_name == THEME_PLAIN)
+    {
+        this->plain_theme_action->setChecked(true);
+
+        // Set background colour of display label
+        this->GetDisplay()->setStyleSheet("");
+        this->GetPositionLabel()->setStyleSheet("");
+        this->GetDisplayBackgroundWidget()->setStyleSheet("");
+        this->GetBackgroundWidget()->setStyleSheet("");
+
     } else {
         this->DisplayError("Unkown theme");
     }

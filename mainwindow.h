@@ -39,6 +39,7 @@
 
 #define THEME_VICE "VICE"
 #define THEME_SA "SA"
+#define THEME_PLAIN "PLAIN"
 #define THEME_DEFAULT THEME_VICE
 
 #ifdef _WIN32
@@ -76,6 +77,7 @@ public slots:
     void ToggleAlwaysOnTop(bool new_value);
     void ViceThemeSelectSlot();
     void SaThemeSelectSlot();
+    void PlainThemeSelectSlot();
 
 private:
     Ui::MainWindow *ui;
@@ -95,6 +97,7 @@ private:
     QMenu* theme_menu;
     QAction* vice_theme_action;
     QAction* sa_theme_action;
+    QAction* plain_theme_action;
 
     // Settings
     QSettings *settings;
