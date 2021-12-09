@@ -149,26 +149,25 @@ void MainWindow::UpdateUiTheme(QString theme_name)
 
         // Set background colour of display label
         this->GetDisplay()->setStyleSheet("QLabel {"
-                                            "background-color: #000012;"
                                             "margin: 1px;"
                                             "color: #ff4df0;"
                                           "}");
         this->GetPositionLabel()->setStyleSheet("QLabel {"
-                                          "background-color: #000012;"
                                           "margin: 1px;"
                                           "color: #ff4df0;"
                                           "}");
         this->GetDisplayBackgroundWidget()->setStyleSheet("QWidget {"
-                                                            "background-color: #000012;"
+                                                            "background-color: #ffffff;"
                                                           "}");
         this->GetBackgroundWidget()->setStyleSheet(
             "QWidget {"
               "background-color: #54c3bc;"
             "}"
             "QPushButton {"
-              "background-color: #f398c1;"
-              ""
-              "color: #70ffdf;"
+              "background-color: #ff4df0;"
+              "color: #ffffff;"
+//              "background-color: #ffffff;"
+//              "color: #ff4df0;"
             "}"
             "QDial {"
               "background-color: #ff4df0;"
