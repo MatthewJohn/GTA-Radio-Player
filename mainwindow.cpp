@@ -37,23 +37,28 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set background colour of display label
     this->GetDisplay()->setStyleSheet("QLabel {"
+                                        "background-color: #000012;"
                                         "margin: 1px;"
-                                        "color: #95c2c8;"
+                                        "color: #ff4df0;"
                                       "}");
     this->GetPositionLabel()->setStyleSheet("QLabel {"
                                       "background-color: #000012;"
                                       "margin: 1px;"
-                                      "color: #95c2c8;"
+                                      "color: #ff4df0;"
                                       "}");
+    this->GetDisplayBackgroundWidget()->setStyleSheet("QWidget {"
+                                                        "background-color: #000012;"
+                                                      "}");
     this->GetBackgroundWidget()->setStyleSheet(
         "QWidget {"
-          "background-color: #000012;"
+          "background-color: #1d269b;"
         "}"
         "QPushButton {"
-          "background-color: #fbad4b;"
+          "background-color: #9d4dff;"
+          "color: #70ffdf;"
         "}"
         "QDial {"
-          "background-color: #fbad4b;"
+          "background-color: #ff4df0;"
         "}"
     );
 
@@ -434,6 +439,11 @@ QPushButton* MainWindow::GetPreviousButton()
 QLabel* MainWindow::GetPositionLabel()
 {
     return this->findChild<QLabel *>("positionLabel");
+}
+
+QWidget* MainWindow::GetDisplayBackgroundWidget()
+{
+    return this->findChild<QWidget *>("displayBackground");
 }
 
 QWidget* MainWindow::GetBackgroundWidget()

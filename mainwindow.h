@@ -137,6 +137,7 @@ private:
     QPushButton* GetNextButton();
     QPushButton* GetPreviousButton();
     QLabel* GetDisplay();
+    QWidget* GetDisplayBackgroundWidget();
     QWidget* GetBackgroundWidget();
 
     void SetDisplay(QString text);
