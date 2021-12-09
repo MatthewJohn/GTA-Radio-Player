@@ -163,10 +163,11 @@ void MainWindow::UpdateUiTheme(QString theme_name)
                                                           "}");
         this->GetBackgroundWidget()->setStyleSheet(
             "QWidget {"
-              "background-color: #1d269b;"
+              "background-color: #54c3bc;"
             "}"
             "QPushButton {"
-              "background-color: #9d4dff;"
+              "background-color: #f398c1;"
+              ""
               "color: #70ffdf;"
             "}"
             "QDial {"
